@@ -1,6 +1,6 @@
 # os_patching
 
-[![CI](https://github.com/voxpupuli/puppet_os_patching/actions/workflows/main.yml/badge.svg)](https://github.com/voxpupuli/puppet_os_patching/actions/workflows/main.yml)
+[![CI](https://github.com/voxpupuli/puppet-os_patching/actions/workflows/main.yml/badge.svg)](https://github.com/voxpupuli/puppet-os_patching/actions/workflows/main.yml)
 [![Donated by albatrossflavor](https://img.shields.io/badge/donated%20by-albatrossflavor-fb7047.svg)](#transfer-notice)
 
 This module contains a set of tasks and custom facts to allow the automation of and reporting on operating system patching. Currently, patching works on Linux (Redhat, Suse and Debian derivatives) and Windows (Server 2008 through to 2019 have been tested).  FreeBSD support is a work in progress and is currently reporting only.
@@ -11,7 +11,7 @@ Under the hood, it uses the OS level tools or APIs to carry out the actual patch
 
 **Note** - FreeBSD support is currently limited to reporting patch state only. Actual patching will be enabled in a future release.
 
-[The wiki](https://github.com/voxpupuli/puppet_os_patching/wiki/Background) contains some useful background information on the module and how it works.
+[The wiki](https://github.com/voxpupuli/puppet-os_patching/wiki/Background) contains some useful background information on the module and how it works.
 
 ## Description
 
