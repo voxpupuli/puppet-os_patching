@@ -28,7 +28,7 @@ Below are some instructions to get you started doing that very thing while setti
 
 - [x] my commit is a single logical unit of work
 
-- [x] I have checked for unnecessary whitespace with "git diff --check" 
+- [x] I have checked for unnecessary whitespace with "git diff --check"
 
 - [x] my commit does not include commented out code or unneeded files
 
@@ -44,7 +44,7 @@ Below are some instructions to get you started doing that very thing while setti
 
 - [x] the first line of my commit message includes:
 
-  - [x] an issue number (if applicable), e.g. "(MODULES-xxxx) This is the first line" 
+  - [x] an issue number (if applicable), e.g. "(MODULES-xxxx) This is the first line"
 
   - [x] a short description (50 characters is the soft limit, excluding ticket number(s))
 
@@ -62,7 +62,7 @@ Below are some instructions to get you started doing that very thing while setti
 
 - Make sure you have a [GitHub account](https://github.com/join)
 
-- [Create a ticket](https://github.com/albatrossflavour/puppet_os_patching/issues/new/choose) if one [does not already exist](https://github.com/albatrossflavour/puppet_os_patching/issues).
+- [Create a ticket](https://github.com/albatrossflavour/puppet-os_patching/issues/new/choose) if one [does not already exist](https://github.com/albatrossflavour/puppet-os_patching/issues).
 
 ### Push and PR
 

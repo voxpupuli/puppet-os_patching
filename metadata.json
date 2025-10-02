@@ -1,12 +1,12 @@
 {
-  "name": "albatrossflavour-os_patching",
+  "name": "puppet-os_patching",
   "version": "0.22.0",
-  "author": "albatrossflavour",
+  "author": "voxpupuli",
   "summary": "Perform OS level patching through tasks and report on patch levels through facts",
   "license": "Apache-2.0",
-  "source": "https://github.com/albatrossflavour/puppet_os_patching",
-  "project_page": "https://github.com/albatrossflavour/puppet_os_patching",
-  "issues_url": "https://github.com/albatrossflavour/puppet_os_patching/issues",
+  "source": "https://github.com/voxpupuli/puppet-os_patching",
+  "project_page": "https://github.com/voxpupuli/puppet-os_patching",
+  "issues_url": "https://github.com/voxpupuli/puppet-os_patching/issues",
   "dependencies": [
     {
       "name": "puppetlabs-stdlib",
