@@ -1,6 +1,7 @@
-![](https://github.com/albatrossflavour/puppet_os_patching/actions/workflows/main.yml/badge.svg?branch=master)
-
 # os_patching
+
+[![CI](https://github.com/voxpupuli/puppet_os_patching/actions/workflows/main.yml/badge.svg)](https://github.com/voxpupuli/puppet_os_patching/actions/workflows/main.yml)
+[![Donated by albatrossflavor](https://img.shields.io/badge/donated%20by-albatrossflavor-fb7047.svg)](#transfer-notice)
 
 This module contains a set of tasks and custom facts to allow the automation of and reporting on operating system patching. Currently, patching works on Linux (Redhat, Suse and Debian derivatives) and Windows (Server 2008 through to 2019 have been tested).  FreeBSD support is a work in progress and is currently reporting only.
 
@@ -10,7 +11,7 @@ Under the hood, it uses the OS level tools or APIs to carry out the actual patch
 
 **Note** - FreeBSD support is currently limited to reporting patch state only. Actual patching will be enabled in a future release.
 
-[The wiki](https://github.com/albatrossflavour/puppet_os_patching/wiki/Background) contains some useful background information on the module and how it works.
+[The wiki](https://github.com/voxpupuli/puppet_os_patching/wiki/Background) contains some useful background information on the module and how it works.
 
 ## Description
 
@@ -35,12 +36,15 @@ Install the module using the Puppetfile, include it on your nodes and then use t
 ## Usage
 
 ### Manifest
+
 Include the module:
+
 ```puppet
 include os_patching
 ```
 
 More advanced usage:
+
 ```puppet
 class { 'os_patching':
   patch_window     => 'Week3',
@@ -56,7 +60,9 @@ class { 'os_patching':
 In that example, the node is assigned to a "patch window", will be forced to reboot regardless of the setting specified in the task and has a blackout window defined for the period of 2018-12-15 - 2019-01-15, during which time no patching through the task can be carried out.
 
 ### Task
+
 Run a basic patching task from the command line:
+
 ```bash
 os_patching::patch_server - Carry out OS patching on the server, optionally including a reboot and/or only applying security-related updates
 
@@ -77,6 +83,7 @@ PARAMETERS:
 ```
 
 Example:
+
 ```bash
 $ puppet task run os_patching::patch_server --params='{"reboot": "patched", "security_only": false}' --query="inventory[certname] { facts.os_patching.patch_window = 'Week3' and facts.os_patching.blocked = false and facts.os_patching.package_update_count > 0}"
 ```
@@ -266,6 +273,7 @@ If patching was blocked, the task will report similar to below:
 Error: Task exited: 100
 Patching blocked
 ```
+
 A summary of the patch run is also written to `/var/cache/os_patching/run_history`, the last line of which is used by the `os_patching.last_run` fact.
 
 ```bash
@@ -362,3 +370,9 @@ Fork, develop, submit a pull request
 - [Jake Rogers](https://github.com/JakeTRogers)
 - [Nathan Giuliani](https://github.com/nathangiuliani)
 - [Massimiliano Adamo](https://github.com/maxadamo)
+
+## Transfer Notice
+
+This project was originally authored by @albatrossflavour.
+The maintainer preferred that Vox Pupuli take ownership of the project for future improvement and maintenance.
+Existing pull requests and issues were transferred over, please fork and continue to contribute here instead of albatrossflavour/puppet_os_patching.
