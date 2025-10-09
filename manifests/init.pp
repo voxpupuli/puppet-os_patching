@@ -168,9 +168,9 @@ class os_patching (
   Variant[Enum['absent'], Integer[1,31]] $patch_cron_monthday,
   Variant[Enum['absent'], Integer[0,7]] $patch_cron_weekday,
   Integer[0,59] $patch_cron_min = fqdn_rand(59),
-  Optional[String] $patch_window = undef,
+  Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]] $patch_window = undef,
   Optional[Hash] $blackout_windows = undef,
-  Optional[String[1]] $group = undef,
+  Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]] $group = undef,
 ) {
   # None tunable
   $cache_dir = lookup('os_patching::cache_dir',Stdlib::Absolutepath,first,undef)
@@ -211,14 +211,6 @@ class os_patching (
   $ensure_dir = $ensure ? {
     'present' => 'directory',
     default   => 'absent',
-  }
-
-  if ($patch_window and $patch_window !~ /[A-Za-z0-9\-_ ]+/ ) {
-    fail('The patch window can only contain alphanumerics, space, underscore and dash')
-  }
-
-  if ($group and $group !~ /^[A-Za-z0-9\-_ ]+$/ ) {
-    fail('The group can only contain alphanumerics, space, underscore and dash')
   }
 
   file { $cache_dir:
