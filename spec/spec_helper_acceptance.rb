@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require 'puppet_litmus'
-require 'spec_helper_acceptance_local' if File.file?(File.join(File.dirname(__FILE__), 'spec_helper_acceptance_local.rb'))
+# Managed by modulesync - DO NOT EDIT
+# https://voxpupuli.org/docs/updating-files-managed-with-modulesync/
 
-PuppetLitmus.configure!
+require 'voxpupuli/acceptance/spec_helper_acceptance'
+
+configure_beaker(modules: :metadata)
+
+Dir['./spec/support/acceptance/**/*.rb'].sort.each { |f| require f }
