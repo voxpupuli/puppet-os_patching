@@ -299,9 +299,10 @@ class os_patching (
 
   file { "${cache_dir}/blackout_windows":
     ensure  => $blackout_windows_ensure,
-    content => epp("${module_name}/blackout_windows.epp", {
-        'blackout_windows' => pick($blackout_windows, {}),
-    }),
+    content => epp(
+      "${module_name}/blackout_windows.epp",
+      { 'blackout_windows' => pick($blackout_windows, {}), }
+    ),
     require => File[$cache_dir],
   }
 
@@ -328,7 +329,7 @@ class os_patching (
             ensure => $yum_utils,
           }
         } else {
-          package { 'dnf-utils':
+          package { 'dnf-utils':
             ensure => $yum_utils,
           }
         }
