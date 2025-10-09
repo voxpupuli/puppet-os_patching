@@ -216,7 +216,7 @@ This overrides the setting in the task
 
 ##### <a name="-os_patching--patch_window"></a>`patch_window`
 
-Data type: `Optional[String]`
+Data type: `Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]]`
 
 A freeform text entry used to allocate a node to a specific patch window (Optional)
 
@@ -302,7 +302,7 @@ Data type: `Enum['present', 'absent']`
 
 ##### <a name="-os_patching--group"></a>`group`
 
-Data type: `Optional[String[1]]`
+Data type: `Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]]`
 
 The group to assign the node for patching purposes.
 
@@ -429,7 +429,7 @@ The following parameters are available in the `os_patching::patch_batch` plan:
 
 ##### <a name="-os_patching--patch_batch--batch"></a>`batch`
 
-Data type: `Array`
+Data type: `TargetSpec`
 
 
 
