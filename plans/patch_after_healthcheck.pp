@@ -6,16 +6,16 @@ plan os_patching::patch_after_healthcheck (
   TargetSpec $nodes,
   Optional[Boolean] $noop_state = false,
   Optional[Integer] $runinterval = 1800,
-  ) {
+) {
   # Run an initial health check to make sure the target nodes are ready
 
   $health_checks = run_task('puppet_health_check::agent_health',
-                            $nodes,
-                            target_noop_state      => $noop_state,
-                            target_service_enabled => true,
-                            target_service_running => true,
-                            target_runinterval     => $runinterval,
-                            '_catch_errors'        => true,
+    $nodes,
+    target_noop_state      => $noop_state,
+    target_service_enabled => true,
+    target_service_running => true,
+    target_runinterval     => $runinterval,
+    '_catch_errors'        => true,
   )
 
   $nodes_to_patch = $health_checks.filter | $items | { $items.value['state'] == 'clean' }
