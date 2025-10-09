@@ -11,42 +11,50 @@ describe 'os_patching' do
         let(:fact_cmd) { '/usr/local/bin/os_patching_fact_generation.sh' }
 
         context 'default installation path for Puppet' do
+          # rubocop:disable Style/StringLiterals
           it {
             is_expected.to contain_exec('os_patching::exec::fact_upload').with(
               'command' => "\"/usr/local/bin/puppet\" facts upload",
             )
           }
+          # rubocop:enable Style/StringLiterals
         end
 
         context 'alternate installation path for Puppet' do
           let(:params) { {'puppet_binary' => '/opt/local/bin/puppet' } }
 
+          # rubocop:disable Style/StringLiterals
           it {
             is_expected.to contain_exec('os_patching::exec::fact_upload').with(
               'command' => "\"/opt/local/bin/puppet\" facts upload",
             )
           }
+          # rubocop:enable Style/StringLiterals
         end
       when 'windows'
         let(:cache_dir) { 'C:/ProgramData/os_patching' }
         let(:fact_cmd) { 'C:/ProgramData/os_patching/os_patching_fact_generation.ps1' }
 
         context 'default installation path for Puppet' do
+          # rubocop:disable Style/StringLiterals
           it {
             is_expected.to contain_exec('os_patching::exec::fact_upload').with(
               'command' => "\"C:/Program Files/Puppet Labs/Puppet/bin/puppet.bat\" facts upload",
             )
           }
+          # rubocop:enable Style/StringLiterals
         end
 
         context 'alternate installation path for Puppet' do
           let(:params) { {'puppet_binary' => 'D:/Program Files/Puppet Labs/Puppet/bin/puppet.bat' } }
 
+          # rubocop:disable Style/StringLiterals
           it {
             is_expected.to contain_exec('os_patching::exec::fact_upload').with(
               'command' => "\"D:/Program Files/Puppet Labs/Puppet/bin/puppet.bat\" facts upload",
             )
           }
+          # rubocop:enable Style/StringLiterals
         end
       end
 
