@@ -1,19 +1,10 @@
 ---
 fixtures:
   repositories:
-    facts: 'git://github.com/puppetlabs/puppetlabs-facts.git'
-    puppet_agent: 'git://github.com/puppetlabs/puppetlabs-puppet_agent.git'
+    facts: 'https://github.com/puppetlabs/puppetlabs-facts.git'
+    puppet_agent: 'https://github.com/puppetlabs/puppetlabs-puppet_agent.git'
     provision: 'https://github.com/puppetlabs/provision.git'
-  forge_modules:
-    stdlib:
-      repo: puppetlabs-stdlib
-      ref: 6.3.0
-    cron_core:
-      repo: puppetlabs-cron_core
-      ref: 1.0.1
-    cron:
-      repo: puppet-cron
-      ref: 1.3.1
-    scheduled_task:
-      repo: puppetlabs-scheduled_task
-      ref: 1.0.1
+    stdlib: 'https://github.com/puppetlabs/puppetlabs-stdlib.git'
+    cron_core: 'https://github.com/puppetlabs/puppetlabs-cron_core.git'
+    cron: 'https://github.com/voxpupuli/puppet-cron.git'
+    scheduled_task: 'https://github.com/puppetlabs/puppetlabs-scheduled_task.git'
