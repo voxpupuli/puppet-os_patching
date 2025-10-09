@@ -95,8 +95,5 @@
       "name": "puppet",
       "version_requirement": ">= 5.3.2 < 9.0.0"
     }
-  ],
-  "pdk-version": "2.1.1",
-  "template-url": "https://github.com/puppetlabs/pdk-templates#main",
-  "template-ref": "heads/main-0-g2381db6"
+  ]
 }
