@@ -1,5 +1,3 @@
-require 'spec_helper_acceptance'
-
 cache_dir = '/var/cache/os_patching'
 
 pp_class_base = <<-PUPPETCODE
