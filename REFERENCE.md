@@ -17,7 +17,7 @@ the `os_patching` fact.
 
 ### Plans
 
-* [`os_patching::patch_after_healthcheck`](#os_patchingpatch_after_healthcheck): An example plan that uses the
+* [`os_patching::patch_after_healthcheck`](#os_patching--patch_after_healthcheck): An example plan that uses the
 [puppet health check](https://forge.puppet.com/albatrossflavour/puppet_health_check)
 module to perform a pre-check on the nodes you're planning to patch.  If the nodes pass the
 check, they get patched
@@ -37,11 +37,11 @@ the `os_patching` fact.
 class { 'os_patching':
   patch_window     => 'Week3',
   reboot_override  => 'always',
-  blackout_windows => {
-    'End of year change freeze' => {
-      'start' => '2018-12-15T00:00:00+10:00',
-      'end'   => '2019-01-15T23:59:59+10:00',
-    },
+  blackout_windows => { 'End of year change freeze':
+    {
+      'start': '2018-12-15T00:00:00+10:00',
+      'end': '2019-01-15T23:59:59+10:00',
+    }
   },
 }
 ```
@@ -93,65 +93,65 @@ class { 'os_patching':
 
 The following parameters are available in the `os_patching` class:
 
-* [`puppet_binary`](#puppet_binary)
-* [`patch_data_owner`](#patch_data_owner)
-* [`patch_data_group`](#patch_data_group)
-* [`patch_cron_user`](#patch_cron_user)
-* [`manage_yum_utils`](#manage_yum_utils)
-* [`block_patching_on_warnings`](#block_patching_on_warnings)
-* [`yum_utils`](#yum_utils)
-* [`fact_upload`](#fact_upload)
-* [`apt_autoremove`](#apt_autoremove)
-* [`manage_delta_rpm`](#manage_delta_rpm)
-* [`delta_rpm`](#delta_rpm)
-* [`manage_yum_plugin_security`](#manage_yum_plugin_security)
-* [`yum_plugin_security`](#yum_plugin_security)
-* [`reboot_override`](#reboot_override)
-* [`patch_window`](#patch_window)
-* [`pre_patching_command`](#pre_patching_command)
-* [`patch_cron_hour`](#patch_cron_hour)
-* [`patch_cron_month`](#patch_cron_month)
-* [`patch_cron_monthday`](#patch_cron_monthday)
-* [`patch_cron_weekday`](#patch_cron_weekday)
-* [`patch_cron_min`](#patch_cron_min)
-* [`windows_update_hour`](#windows_update_hour)
-* [`windows_update_interval_mins`](#windows_update_interval_mins)
-* [`ensure`](#ensure)
-* [`fact_mode`](#fact_mode)
-* [`blackout_windows`](#blackout_windows)
+* [`puppet_binary`](#-os_patching--puppet_binary)
+* [`patch_data_owner`](#-os_patching--patch_data_owner)
+* [`patch_data_group`](#-os_patching--patch_data_group)
+* [`patch_cron_user`](#-os_patching--patch_cron_user)
+* [`manage_yum_utils`](#-os_patching--manage_yum_utils)
+* [`block_patching_on_warnings`](#-os_patching--block_patching_on_warnings)
+* [`yum_utils`](#-os_patching--yum_utils)
+* [`fact_upload`](#-os_patching--fact_upload)
+* [`apt_autoremove`](#-os_patching--apt_autoremove)
+* [`manage_delta_rpm`](#-os_patching--manage_delta_rpm)
+* [`delta_rpm`](#-os_patching--delta_rpm)
+* [`manage_yum_plugin_security`](#-os_patching--manage_yum_plugin_security)
+* [`yum_plugin_security`](#-os_patching--yum_plugin_security)
+* [`reboot_override`](#-os_patching--reboot_override)
+* [`patch_window`](#-os_patching--patch_window)
+* [`blackout_windows`](#-os_patching--blackout_windows)
+* [`pre_patching_command`](#-os_patching--pre_patching_command)
+* [`patch_cron_hour`](#-os_patching--patch_cron_hour)
+* [`patch_cron_month`](#-os_patching--patch_cron_month)
+* [`patch_cron_monthday`](#-os_patching--patch_cron_monthday)
+* [`patch_cron_weekday`](#-os_patching--patch_cron_weekday)
+* [`patch_cron_min`](#-os_patching--patch_cron_min)
+* [`windows_update_hour`](#-os_patching--windows_update_hour)
+* [`windows_update_interval_mins`](#-os_patching--windows_update_interval_mins)
+* [`fact_mode`](#-os_patching--fact_mode)
+* [`ensure`](#-os_patching--ensure)
 
-##### <a name="puppet_binary"></a>`puppet_binary`
+##### <a name="-os_patching--puppet_binary"></a>`puppet_binary`
 
 Data type: `Stdlib::Absolutepath`
 
 Location of the Puppet binary
 
-##### <a name="patch_data_owner"></a>`patch_data_owner`
+##### <a name="-os_patching--patch_data_owner"></a>`patch_data_owner`
 
 Data type: `String`
 
 User name for the owner of the patch data
 
-##### <a name="patch_data_group"></a>`patch_data_group`
+##### <a name="-os_patching--patch_data_group"></a>`patch_data_group`
 
 Data type: `String`
 
 Group name for the owner of the patch data
 
-##### <a name="patch_cron_user"></a>`patch_cron_user`
+##### <a name="-os_patching--patch_cron_user"></a>`patch_cron_user`
 
 Data type: `String`
 
 User who runs the cron job
 
-##### <a name="manage_yum_utils"></a>`manage_yum_utils`
+##### <a name="-os_patching--manage_yum_utils"></a>`manage_yum_utils`
 
 Data type: `Boolean`
 
-Should the yum_utils package be managed by this module on RedHat family nodes?
+Should the yum_utils/dnf_utils package be managed by this module on RedHat family nodes?
 If `true`, use the parameter `yum_utils` to determine how it should be manged
 
-##### <a name="block_patching_on_warnings"></a>`block_patching_on_warnings`
+##### <a name="-os_patching--block_patching_on_warnings"></a>`block_patching_on_warnings`
 
 Data type: `Boolean`
 
@@ -159,134 +159,70 @@ If there are warnings present in the os_patching fact, should the patching task 
 If `true` the run will abort and take no action
 If `false` the run will continue and attempt to patch (default)
 
-##### <a name="yum_utils"></a>`yum_utils`
+##### <a name="-os_patching--yum_utils"></a>`yum_utils`
 
 Data type: `Enum['installed', 'absent', 'purged', 'held', 'latest']`
 
 If managed, what should the yum_utils package set to?
 
-##### <a name="fact_upload"></a>`fact_upload`
+##### <a name="-os_patching--fact_upload"></a>`fact_upload`
 
 Data type: `Boolean`
 
 Should `puppet fact upload` be run after any changes to the fact cache files?
 
-##### <a name="apt_autoremove"></a>`apt_autoremove`
+##### <a name="-os_patching--apt_autoremove"></a>`apt_autoremove`
 
 Data type: `Boolean`
 
 Should `apt-get autoremove` be run during reboot?
 
-##### <a name="manage_delta_rpm"></a>`manage_delta_rpm`
+##### <a name="-os_patching--manage_delta_rpm"></a>`manage_delta_rpm`
 
 Data type: `Boolean`
 
 Should the deltarpm package be managed by this module on RedHat family nodes?
 If `true`, use the parameter `delta_rpm` to determine how it should be manged
 
-##### <a name="delta_rpm"></a>`delta_rpm`
+##### <a name="-os_patching--delta_rpm"></a>`delta_rpm`
 
 Data type: `Enum['installed', 'absent', 'purged', 'held', 'latest']`
 
 If managed, what should the delta_rpm package set to?
 
-##### <a name="manage_yum_plugin_security"></a>`manage_yum_plugin_security`
+##### <a name="-os_patching--manage_yum_plugin_security"></a>`manage_yum_plugin_security`
 
 Data type: `Boolean`
 
 Should the yum_plugin_security package be managed by this module on RedHat family nodes?
 If `true`, use the parameter `yum_plugin_security` to determine how it should be manged
 
-##### <a name="yum_plugin_security"></a>`yum_plugin_security`
+##### <a name="-os_patching--yum_plugin_security"></a>`yum_plugin_security`
 
 Data type: `Enum['installed', 'absent', 'purged', 'held', 'latest']`
 
 If managed, what should the yum_plugin_security package set to?
 
-##### <a name="reboot_override"></a>`reboot_override`
+##### <a name="-os_patching--reboot_override"></a>`reboot_override`
 
 Data type: `Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart', 'default']]]`
 
 Controls on a node level if a reboot should/should not be done after patching.
 This overrides the setting in the task
 
-##### <a name="patch_window"></a>`patch_window`
+##### <a name="-os_patching--patch_window"></a>`patch_window`
 
 Data type: `Optional[String]`
 
 A freeform text entry used to allocate a node to a specific patch window (Optional)
 
-Default value: ``undef``
+Default value: `undef`
 
-##### <a name="pre_patching_command"></a>`pre_patching_command`
-
-Data type: `Optional[Stdlib::Absolutepath]`
-
-The full path of the command to run prior to running patching.  Can be used to
-run customised workflows such as gracefully shutting down applications.  The entry
-must be a single absolute filename with no arguments or parameters.
-
-##### <a name="patch_cron_hour"></a>`patch_cron_hour`
-
-Data type: `Variant[Enum['absent'], Integer[0,23]]`
-
-The hour(s) for the cron job to run (defaults to absent, which means '*' in cron)
-
-##### <a name="patch_cron_month"></a>`patch_cron_month`
-
-Data type: `Variant[Enum['absent'], Integer[1,12]]`
-
-The month(s) for the cron job to run (defaults to absent, which means '*' in cron)
-
-##### <a name="patch_cron_monthday"></a>`patch_cron_monthday`
-
-Data type: `Variant[Enum['absent'], Integer[1,31]]`
-
-The monthday(s) for the cron job to run (defaults to absent, which means '*' in cron)
-
-##### <a name="patch_cron_weekday"></a>`patch_cron_weekday`
-
-Data type: `Variant[Enum['absent'], Integer[0,7]]`
-
-The weekday(s) for the cron job to run (defaults to absent, which means '*' in cron)
-
-##### <a name="patch_cron_min"></a>`patch_cron_min`
-
-Data type: `Integer[0,59]`
-
-The min(s) for the cron job to run (defaults to a random number between 0 and 59)
-
-Default value: `fqdn_rand(59)`
-
-##### <a name="windows_update_hour"></a>`windows_update_hour`
-
-Data type: `Integer[0,23]`
-
-Control the hour on which windows nodes check for updates
-
-##### <a name="windows_update_interval_mins"></a>`windows_update_interval_mins`
-
-Data type: `Integer`
-
-Control how often windows updates for updates
-
-##### <a name="ensure"></a>`ensure`
-
-Data type: `Enum['present', 'absent']`
-
-`present` to install scripts, cronjobs, files, etc, `absent` to cleanup a system that previously hosted us
-
-##### <a name="fact_mode"></a>`fact_mode`
-
-Data type: `Stdlib::Filemode`
-
-
-
-##### <a name="blackout_windows"></a>`blackout_windows`
+##### <a name="-os_patching--blackout_windows"></a>`blackout_windows`
 
 Data type: `Optional[Hash]`
 
-
+Hash of start/end blackout dates+times (Optional)
 
 Options:
 
@@ -294,7 +230,71 @@ Options:
 * **:start** `String`: Start of the blackout window (ISO8601 format)
 * **:end** `String`: End of the blackout window (ISO8601 format)
 
-Default value: ``undef``
+Default value: `undef`
+
+##### <a name="-os_patching--pre_patching_command"></a>`pre_patching_command`
+
+Data type: `Optional[Stdlib::Absolutepath]`
+
+The full path of the command to run prior to running patching.  Can be used to
+run customised workflows such as gracefully shutting down applications.  The entry
+must be a single absolute filename with no arguments or parameters.
+
+##### <a name="-os_patching--patch_cron_hour"></a>`patch_cron_hour`
+
+Data type: `Variant[Enum['absent'], Integer[0,23]]`
+
+The hour(s) for the cron job to run (defaults to absent, which means '*' in cron)
+
+##### <a name="-os_patching--patch_cron_month"></a>`patch_cron_month`
+
+Data type: `Variant[Enum['absent'], Integer[1,12]]`
+
+The month(s) for the cron job to run (defaults to absent, which means '*' in cron)
+
+##### <a name="-os_patching--patch_cron_monthday"></a>`patch_cron_monthday`
+
+Data type: `Variant[Enum['absent'], Integer[1,31]]`
+
+The monthday(s) for the cron job to run (defaults to absent, which means '*' in cron)
+
+##### <a name="-os_patching--patch_cron_weekday"></a>`patch_cron_weekday`
+
+Data type: `Variant[Enum['absent'], Integer[0,7]]`
+
+The weekday(s) for the cron job to run (defaults to absent, which means '*' in cron)
+
+##### <a name="-os_patching--patch_cron_min"></a>`patch_cron_min`
+
+Data type: `Integer[0,59]`
+
+The min(s) for the cron job to run (defaults to a random number between 0 and 59)
+
+Default value: `fqdn_rand(59)`
+
+##### <a name="-os_patching--windows_update_hour"></a>`windows_update_hour`
+
+Data type: `Integer[0,23]`
+
+Control the hour on which windows nodes check for updates
+
+##### <a name="-os_patching--windows_update_interval_mins"></a>`windows_update_interval_mins`
+
+Data type: `Integer`
+
+Control how often windows updates for updates
+
+##### <a name="-os_patching--fact_mode"></a>`fact_mode`
+
+Data type: `Stdlib::Filemode`
+
+Mode to set on fact command file
+
+##### <a name="-os_patching--ensure"></a>`ensure`
+
+Data type: `Enum['present', 'absent']`
+
+`present` to install scripts, cronjobs, files, etc, `absent` to cleanup a system that previously hosted us
 
 ## Tasks
 
@@ -362,7 +362,7 @@ Force a refresh of the os_patching fact cache via a task
 
 ## Plans
 
-### <a name="os_patchingpatch_after_healthcheck"></a>`os_patching::patch_after_healthcheck`
+### <a name="os_patching--patch_after_healthcheck"></a>`os_patching::patch_after_healthcheck`
 
 An example plan that uses the
 [puppet health check](https://forge.puppet.com/albatrossflavour/puppet_health_check)
@@ -373,25 +373,25 @@ check, they get patched
 
 The following parameters are available in the `os_patching::patch_after_healthcheck` plan:
 
-* [`nodes`](#nodes)
-* [`noop_state`](#noop_state)
-* [`runinterval`](#runinterval)
+* [`nodes`](#-os_patching--patch_after_healthcheck--nodes)
+* [`noop_state`](#-os_patching--patch_after_healthcheck--noop_state)
+* [`runinterval`](#-os_patching--patch_after_healthcheck--runinterval)
 
-##### <a name="nodes"></a>`nodes`
+##### <a name="-os_patching--patch_after_healthcheck--nodes"></a>`nodes`
 
 Data type: `TargetSpec`
 
 
 
-##### <a name="noop_state"></a>`noop_state`
+##### <a name="-os_patching--patch_after_healthcheck--noop_state"></a>`noop_state`
 
 Data type: `Optional[Boolean]`
 
 
 
-Default value: ``false``
+Default value: `false`
 
-##### <a name="runinterval"></a>`runinterval`
+##### <a name="-os_patching--patch_after_healthcheck--runinterval"></a>`runinterval`
 
 Data type: `Optional[Integer]`
 
