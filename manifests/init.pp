@@ -328,7 +328,7 @@ class os_patching (
             ensure => $yum_utils,
           }
         } else {
-          package { 'dnf-utils':
+          package { 'dnf-utils':
             ensure => $yum_utils,
           }
         }
