@@ -1,3 +1,5 @@
+require 'spec_helper_acceptance'
+
 cache_dir = '/var/cache/os_patching'
 
 pp_class_base = <<-PUPPETCODE
@@ -67,7 +69,7 @@ describe 'os_patching module with blackout window' do
       expect(file(cache_dir + '/reboot_required')).to be_file
       expect(file(cache_dir + '/reboot_override')).to be_file
       expect(file(cache_dir + '/blackout_windows')).to be_file
-      expect(file(cache_dir + '/blackout_windows')).to contain (/End of year/)
+      expect(file(cache_dir + '/blackout_windows')).to contain(/End of year/)
       expect(file(cache_dir + '/patch_window')).not_to be_file
       expect(file('/usr/local/bin/os_patching_fact_generation.sh')).to be_file
       expect { run_bolt_task('os_patching::patch_server') }.to raise_error(/Patching blocked/)
@@ -87,7 +89,7 @@ describe 'os_patching module with patching window' do
       expect(file(cache_dir + '/reboot_override')).to be_file
       expect(file(cache_dir + '/blackout_windows')).not_to be_file
       expect(file(cache_dir + '/patch_window')).to be_file
-      expect(file(cache_dir + '/patch_window')).to contain (/Week1/)
+      expect(file(cache_dir + '/patch_window')).to contain(/Week1/)
       expect(file('/usr/local/bin/os_patching_fact_generation.sh')).to be_file
     end
   end
