@@ -15,7 +15,7 @@ plan os_patching::patch_batch (
 
   if $run_health_check {
     out::message('patch_batch.pp: Running health check before patching')
-    run_task('os_patching::health_check', $targets,
+    $health_checks = run_task('os_patching::health_check', $targets,
       _catch_errors          => $catch_errors,
       target_noop_state      => $noop_state,
       target_runinterval     => $runinterval,
@@ -24,9 +24,9 @@ plan os_patching::patch_batch (
     )
 
     $nodes_to_patch = $health_checks.filter | $items | { $items.value['state'] == 'clean' }
-    $nodes_skipped  = $health_checks.filter | $items | { $items.value['state'] != 'clean' }
+    $nodes_to_skip  = $targets - $nodes_to_patch
 
-    $skipped_nodes = $nodes_skipped.map | $value | { $value['certname'] }
+    $skipped_nodes = $nodes_to_skip.map | $value | { $value['certname'] }
     $patchable_nodes = $nodes_to_patch.map | $value | { $value['certname'] }
 
     $task_result = run_task('os_patching::patch_server', $patchable_nodes,
