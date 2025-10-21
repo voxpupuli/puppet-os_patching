@@ -141,7 +141,7 @@ describe 'os_patching' do
 
       context 'with patch_window => $#&!RYYQ!' do
         let(:params) { {'patch_window' => '(((((##(@(!$#&!RYYQ!'} }
-        it { is_expected.to compile }
+        it { is_expected.to raise_error(Puppet::Error, /patch_window/) }
       end
 
       context 'with patch_window => Week3' do
