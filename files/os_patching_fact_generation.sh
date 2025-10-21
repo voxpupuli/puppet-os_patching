@@ -42,9 +42,9 @@ case $OSFAMILY in
     # Security: kernel-3.14.2-200.fc20.x86_64 is the currently running version
     # ---
     # We need to filter those out as they screw up the package listing
-    PKGS=$(yum -q check-update 2>/dev/null| egrep -v "^[Ss]ecurity:" | grep -oP '^.*?(?= )')
+    PKGS=$(yum -q check-update 2>/dev/null| grep -E -v "^[Ss]ecurity:" | grep -oP '^.*?(?= )')
     PKGS=$(echo $PKGS | sed 's/Obsoleting.*//')
-    SECPKGS=$(yum -q --security check-update 2>/dev/null| egrep -v "^Security:" | grep -oP '^.*?(?= )')
+    SECPKGS=$(yum -q --security check-update 2>/dev/null| grep -E -v "^Security:" | grep -oP '^.*?(?= )')
     SECPKGS=$(echo $SECPKGS | sed 's/Obsoleting.*//')
     HELDPKGS=$([ -r /etc/yum/pluginconf.d/versionlock.list ] && awk -F':' '/:/ {print $2}' /etc/yum/pluginconf.d/versionlock.list | sed 's/-[0-9].*//')
   ;;
@@ -123,7 +123,7 @@ cat /dev/null > ${MISMATCHHELDPKGFILE}
 cat /dev/null > ${CATHELDPKGFILE}
 for CATHELD in $VERSION_LOCK_FROM_CATALOG
 do
-  if [ $(egrep -c "^${CATHELD}$" ${OSHELDPKGFILE}) -eq 0 ]
+  if [ $(grep -E -c "^${CATHELD}$" ${OSHELDPKGFILE}) -eq 0 ]
 	then
 		echo "$CATHELD" >> ${MISMATCHHELDPKGFILE}
 	fi
