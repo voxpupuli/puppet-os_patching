@@ -96,6 +96,9 @@
 # @param ensure
 #   `present` to install scripts, cronjobs, files, etc, `absent` to cleanup a system that previously hosted us
 #
+# @param group
+#   The group to assign the node for patching purposes.
+#
 # @example assign node to 'Week3' patching window, force a reboot and create a blackout window for the end of the year
 #   class { 'os_patching':
 #     patch_window     => 'Week3',
@@ -106,6 +109,7 @@
 #         'end'   => '2019-01-15T23:59:59+10:00',
 #       },
 #     },
+#     group            => 'patching01',
 #   }
 #
 # @example An example profile to setup patching, sourcing blackout windows from hiera
@@ -125,6 +129,7 @@
 #       patch_window     => $patch_window,
 #       reboot_override  => $reboot_override,
 #       blackout_windows => $full_blackout_windows,
+#       group            => 'patching01',
 #     }
 #   }
 #
@@ -163,8 +168,9 @@ class os_patching (
   Variant[Enum['absent'], Integer[1,31]] $patch_cron_monthday,
   Variant[Enum['absent'], Integer[0,7]] $patch_cron_weekday,
   Integer[0,59] $patch_cron_min = fqdn_rand(59),
-  Optional[String] $patch_window = undef,
+  Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]] $patch_window = undef,
   Optional[Hash] $blackout_windows = undef,
+  Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]] $group = undef,
 ) {
   # None tunable
   $cache_dir = lookup('os_patching::cache_dir',Stdlib::Absolutepath,first,undef)
@@ -207,10 +213,6 @@ class os_patching (
     default   => 'absent',
   }
 
-  if ($patch_window and $patch_window !~ /[A-Za-z0-9\-_ ]+/ ) {
-    fail('The patch window can only contain alphanumerics, space, underscore and dash')
-  }
-
   file { $cache_dir:
     ensure => $ensure_dir,
     force  => true,
@@ -243,6 +245,11 @@ class os_patching (
     default => 'absent'
   }
 
+  $group_ensure = ($ensure == 'present' and $group) ? {
+    true    => 'file',
+    default => 'absent',
+  }
+
   file { "${cache_dir}/patch_window":
     ensure  => $patch_window_ensure,
     content => $patch_window,
@@ -256,6 +263,11 @@ class os_patching (
   file { "${cache_dir}/block_patching_on_warnings":
     ensure => $block_patching_ensure,
     notify => Exec[$fact_exec],
+  }
+
+  file { "${cache_dir}/group":
+    ensure  => $group_ensure,
+    content => $group,
   }
 
   $reboot_override_ensure = ($ensure == 'present' and $reboot_override) ? {
@@ -314,6 +326,7 @@ class os_patching (
         "${cache_dir}/patch_window",
         "${cache_dir}/reboot_override",
         "${cache_dir}/blackout_windows",
+        "${cache_dir}/group",
       ],
     }
   }
