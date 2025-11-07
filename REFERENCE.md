@@ -21,6 +21,9 @@ the `os_patching` fact.
 [puppet health check](https://forge.puppet.com/albatrossflavour/puppet_health_check)
 module to perform a pre-check on the nodes you're planning to patch.  If the nodes pass the
 check, they get patched
+* [`os_patching::patch_batch`](#os_patching--patch_batch): Patch nodes in a batch, is called from patch_group plan or patch_pql plan
+* [`os_patching::patch_group`](#os_patching--patch_group): Patch nodes collected by a fact group
+* [`os_patching::patch_pql`](#os_patching--patch_pql): Patch nodes collected by a PQL query
 
 ## Classes
 
@@ -43,6 +46,7 @@ class { 'os_patching':
       'end'   => '2019-01-15T23:59:59+10:00',
     },
   },
+  group            => 'patching01',
 }
 ```
 
@@ -65,6 +69,7 @@ class profiles::soe::patching (
     patch_window     => $patch_window,
     reboot_override  => $reboot_override,
     blackout_windows => $full_blackout_windows,
+    group            => 'patching01',
   }
 }
 ```
@@ -119,6 +124,7 @@ The following parameters are available in the `os_patching` class:
 * [`windows_update_interval_mins`](#-os_patching--windows_update_interval_mins)
 * [`fact_mode`](#-os_patching--fact_mode)
 * [`ensure`](#-os_patching--ensure)
+* [`group`](#-os_patching--group)
 
 ##### <a name="-os_patching--puppet_binary"></a>`puppet_binary`
 
@@ -212,7 +218,7 @@ This overrides the setting in the task
 
 ##### <a name="-os_patching--patch_window"></a>`patch_window`
 
-Data type: `Optional[String]`
+Data type: `Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]]`
 
 A freeform text entry used to allocate a node to a specific patch window (Optional)
 
@@ -295,6 +301,14 @@ Mode to set on fact command file
 Data type: `Enum['present', 'absent']`
 
 `present` to install scripts, cronjobs, files, etc, `absent` to cleanup a system that previously hosted us
+
+##### <a name="-os_patching--group"></a>`group`
+
+Data type: `Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]]`
+
+The group to assign the node for patching purposes.
+
+Default value: `undef`
 
 ## Tasks
 
@@ -398,4 +412,198 @@ Data type: `Optional[Integer]`
 
 
 Default value: `1800`
+
+### <a name="os_patching--patch_batch"></a>`os_patching::patch_batch`
+
+Patch nodes in a batch, is called from patch_group plan or patch_pql plan
+
+#### Parameters
+
+The following parameters are available in the `os_patching::patch_batch` plan:
+
+* [`batch`](#-os_patching--patch_batch--batch)
+* [`catch_errors`](#-os_patching--patch_batch--catch_errors)
+* [`noop_state`](#-os_patching--patch_batch--noop_state)
+* [`run_health_check`](#-os_patching--patch_batch--run_health_check)
+* [`service_enabled`](#-os_patching--patch_batch--service_enabled)
+* [`service_running`](#-os_patching--patch_batch--service_running)
+* [`runinterval`](#-os_patching--patch_batch--runinterval)
+* [`debug`](#-os_patching--patch_batch--debug)
+
+##### <a name="-os_patching--patch_batch--batch"></a>`batch`
+
+Data type: `TargetSpec`
+
+The batch of nodes to patch
+
+##### <a name="-os_patching--patch_batch--catch_errors"></a>`catch_errors`
+
+Data type: `Boolean`
+
+Whether to catch errors during task execution
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_batch--noop_state"></a>`noop_state`
+
+Data type: `Boolean`
+
+Whether to consider noop state during health check
+
+Default value: `false`
+
+##### <a name="-os_patching--patch_batch--run_health_check"></a>`run_health_check`
+
+Data type: `Boolean`
+
+Whether to run a health check before patching
+
+Default value: `false`
+
+##### <a name="-os_patching--patch_batch--service_enabled"></a>`service_enabled`
+
+Data type: `Boolean`
+
+Whether the puppet service should be enabled during health check
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_batch--service_running"></a>`service_running`
+
+Data type: `Boolean`
+
+Whether the puppet service should be running during health check
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_batch--runinterval"></a>`runinterval`
+
+Data type: `Integer[0]`
+
+The runinterval to use during health check
+
+Default value: `1800`
+
+##### <a name="-os_patching--patch_batch--debug"></a>`debug`
+
+Data type: `Boolean`
+
+Whether to enable debug output
+
+Default value: `false`
+
+### <a name="os_patching--patch_group"></a>`os_patching::patch_group`
+
+Patch nodes collected by a fact group
+
+#### Parameters
+
+The following parameters are available in the `os_patching::patch_group` plan:
+
+* [`group`](#-os_patching--patch_group--group)
+* [`patch_in_batches`](#-os_patching--patch_group--patch_in_batches)
+* [`batch_size`](#-os_patching--patch_group--batch_size)
+* [`run_health_check`](#-os_patching--patch_group--run_health_check)
+* [`debug`](#-os_patching--patch_group--debug)
+* [`pql_query`](#-os_patching--patch_group--pql_query)
+
+##### <a name="-os_patching--patch_group--group"></a>`group`
+
+Data type: `String[1]`
+
+The fact group name to patch
+
+##### <a name="-os_patching--patch_group--patch_in_batches"></a>`patch_in_batches`
+
+Data type: `Boolean`
+
+Whether to patch nodes in batches
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_group--batch_size"></a>`batch_size`
+
+Data type: `Integer[0]`
+
+The size of each batch if patching in batches
+
+Default value: `15`
+
+##### <a name="-os_patching--patch_group--run_health_check"></a>`run_health_check`
+
+Data type: `Boolean`
+
+Whether to run a health check after patching
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_group--debug"></a>`debug`
+
+Data type: `Boolean`
+
+Whether to enable debug output
+
+Default value: `false`
+
+##### <a name="-os_patching--patch_group--pql_query"></a>`pql_query`
+
+Data type: `String[1]`
+
+The PQL query to retrieve nodes in the group
+
+Default value: `"inventory[certname] { facts.os_patching.group = '${group}'}"`
+
+### <a name="os_patching--patch_pql"></a>`os_patching::patch_pql`
+
+Patch nodes collected by a PQL query
+
+#### Parameters
+
+The following parameters are available in the `os_patching::patch_pql` plan:
+
+* [`pql_query`](#-os_patching--patch_pql--pql_query)
+* [`patch_in_batches`](#-os_patching--patch_pql--patch_in_batches)
+* [`batch_size`](#-os_patching--patch_pql--batch_size)
+* [`run_health_check`](#-os_patching--patch_pql--run_health_check)
+* [`debug`](#-os_patching--patch_pql--debug)
+
+##### <a name="-os_patching--patch_pql--pql_query"></a>`pql_query`
+
+Data type: `String[1]`
+
+The PQL query to retrieve nodes to patch
+
+Default value: `'inventory[certname] { facts.os.family = "redhat" }'`
+
+##### <a name="-os_patching--patch_pql--patch_in_batches"></a>`patch_in_batches`
+
+Data type: `Boolean`
+
+Whether to patch nodes in batches
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_pql--batch_size"></a>`batch_size`
+
+Data type: `Integer[0]`
+
+The size of each batch if patching in batches
+
+Default value: `15`
+
+##### <a name="-os_patching--patch_pql--run_health_check"></a>`run_health_check`
+
+Data type: `Boolean`
+
+Whether to run a health check after patching
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_pql--debug"></a>`debug`
+
+Data type: `Boolean`
+
+Whether to enable debug output
+
+Default value: `false`
 

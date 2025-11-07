@@ -302,5 +302,21 @@ else
       data['blocked_reasons'] = blocked_reasons
       data
     end
+
+    chunk(:group) do
+      data = {}
+      groupfile = os_patching_dir + '/group'
+      if File.file?(groupfile)
+        group = File.open(groupfile, 'r').to_a
+        line = group.last.chomp
+        matchdata = line.match(/^(.*)$/)
+        if matchdata[0]
+          data['group'] = matchdata[0]
+        end
+      else
+        data['group'] = 'default'
+      end
+      data
+    end
   end
 end
