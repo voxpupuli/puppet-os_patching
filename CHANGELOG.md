@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v2.0.0](https://github.com/voxpupuli/puppet-os_patching/tree/v2.0.0) (2025-11-13)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v1.0.0...v2.0.0)
+
+**Breaking changes:**
+
+- feat: add group and batch patching [\#255](https://github.com/voxpupuli/puppet-os_patching/pull/255) ([rwaffen](https://github.com/rwaffen))
+
+**Merged pull requests:**
+
+- chore: remove obsolete configuration [\#259](https://github.com/voxpupuli/puppet-os_patching/pull/259) ([rwaffen](https://github.com/rwaffen))
+
 ## [v1.0.0](https://github.com/voxpupuli/puppet-os_patching/tree/v1.0.0) (2025-11-06)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v0.23.0...v1.0.0)
