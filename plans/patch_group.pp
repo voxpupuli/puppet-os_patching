@@ -1,21 +1,45 @@
 # @summary Patch nodes collected by a fact group
 #
-# @param group The fact group name to patch
-# @param patch_in_batches Whether to patch nodes in batches
 # @param batch_size The size of each batch if patching in batches
-# @param run_health_check Whether to run a health check after patching
+# @param catch_errors Whether to catch errors during task execution
+# @param clean_cache Whether to clean the package manager cache before patching
 # @param debug Whether to enable debug output
+# @param dpkg_params Additional parameters for apt/dpkg
+# @param group The fact group name to patch
+# @param noop_state Whether to consider noop state during health check
+# @param patch_in_batches Whether to patch nodes in batches
 # @param pql_query The PQL query to retrieve nodes in the group
+# @param reboot Reboot strategy after patching
+# @param run_health_check Whether to run a health check after patching
+# @param runinterval The runinterval to use during health check
+# @param security_only Whether to apply only security updates
+# @param service_enabled Whether the puppet service should be enabled during health check
+# @param service_running Whether the puppet service should be running during health check
+# @param timeout The timeout for the patching task
+# @param yum_params Additional parameters for yum
+# @param zypper_params Additional parameters for zypper
 #
 # @return A hash containing the results of the patching operation
 #
 plan os_patching::patch_group (
   String[1] $group,
-  String[1] $pql_query      = "inventory[certname] { facts.os_patching.group = '${group}'}",
-  Boolean $patch_in_batches = true,
-  Integer[0] $batch_size    = 15,
-  Boolean $run_health_check = true,
+  Boolean $catch_errors     = true,
   Boolean $debug            = false,
+  Boolean $noop_state       = false,
+  Boolean $patch_in_batches = true,
+  Boolean $run_health_check = true,
+  Boolean $service_enabled  = true,
+  Boolean $service_running  = true,
+  Integer[1] $batch_size    = 15,
+  Integer[0] $runinterval   = 1800,
+  Optional[Boolean] $clean_cache   = undef,
+  Optional[Boolean] $security_only = undef,
+  Optional[Integer[1]] $timeout    = undef,
+  Optional[String] $dpkg_params   = undef,
+  Optional[String] $yum_params    = undef,
+  Optional[String] $zypper_params = undef,
+  Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]] $reboot = undef,
+  String[1] $pql_query = "inventory[certname] { facts.os_patching.group = '${group}'}",
 ) {
   $pql_data = puppetdb_query($pql_query)
   $certnames = $pql_data.map |$item| { $item['certname'] }
@@ -36,8 +60,20 @@ plan os_patching::patch_group (
       run_plan('os_patching::patch_batch',
         {
           batch            => $batch,
-          run_health_check => $run_health_check,
+          catch_errors     => $catch_errors,
+          clean_cache      => $clean_cache,
           debug            => $debug,
+          dpkg_params      => $dpkg_params,
+          reboot           => $reboot,
+          run_health_check => $run_health_check,
+          security_only    => $security_only,
+          timeout          => $timeout,
+          yum_params       => $yum_params,
+          zypper_params    => $zypper_params,
+          noop_state       => $noop_state,
+          service_enabled  => $service_enabled,
+          service_running  => $service_running,
+          runinterval      => $runinterval,
         }
       )
     }
@@ -55,8 +91,20 @@ plan os_patching::patch_group (
     $result = run_plan('os_patching::patch_batch',
       {
         batch            => $targets,
-        run_health_check => $run_health_check,
+        catch_errors     => $catch_errors,
+        clean_cache      => $clean_cache,
         debug            => $debug,
+        dpkg_params      => $dpkg_params,
+        reboot           => $reboot,
+        run_health_check => $run_health_check,
+        security_only    => $security_only,
+        timeout          => $timeout,
+        yum_params       => $yum_params,
+        zypper_params    => $zypper_params,
+        noop_state       => $noop_state,
+        service_enabled  => $service_enabled,
+        service_running  => $service_running,
+        runinterval      => $runinterval,
       }
     )
   }
