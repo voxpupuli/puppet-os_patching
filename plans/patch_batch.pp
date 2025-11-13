@@ -2,24 +2,38 @@
 #
 # @param batch The batch of nodes to patch
 # @param catch_errors Whether to catch errors during task execution
+# @param clean_cache Whether to clean the package manager cache before patching
+# @param debug Whether to enable debug output
+# @param dpkg_params Additional parameters for apt/dpkg
 # @param noop_state Whether to consider noop state during health check
+# @param reboot Reboot strategy after patching
 # @param run_health_check Whether to run a health check before patching
+# @param runinterval The runinterval to use during health check
+# @param security_only Whether to apply only security updates
 # @param service_enabled Whether the puppet service should be enabled during health check
 # @param service_running Whether the puppet service should be running during health check
-# @param runinterval The runinterval to use during health check
-# @param debug Whether to enable debug output
+# @param timeout The timeout for the patching task
+# @param yum_params Additional parameters for yum
+# @param zypper_params Additional parameters for zypper
 #
 # @return A hash containing the results of the patching operation
 #
 plan os_patching::patch_batch (
   TargetSpec $batch,
   Boolean $catch_errors     = true,
+  Boolean $debug            = false,
   Boolean $noop_state       = false,
   Boolean $run_health_check = false,
   Boolean $service_enabled  = true,
   Boolean $service_running  = true,
   Integer[0] $runinterval   = 1800,
-  Boolean $debug            = false,
+  Optional[Boolean] $clean_cache   = undef,
+  Optional[Boolean] $security_only = undef,
+  Optional[Integer[1]] $timeout    = undef,
+  Optional[String] $dpkg_params    = undef,
+  Optional[String] $yum_params     = undef,
+  Optional[String] $zypper_params  = undef,
+  Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]] $reboot = undef,
 ) {
   out::message("patch_batch.pp: Patching batch of nodes: ${batch}")
   out::message("patch_batch.pp: Health check is ${run_health_check}.")
@@ -53,6 +67,13 @@ plan os_patching::patch_batch (
 
     $patching_result = run_task('os_patching::patch_server', $nodes_to_patch,
       _catch_errors => $catch_errors,
+      clean_cache   => $clean_cache,
+      dpkg_params   => $dpkg_params,
+      reboot        => $reboot,
+      security_only => $security_only,
+      timeout       => $timeout,
+      yum_params    => $yum_params,
+      zypper_params => $zypper_params,
     )
 
     if $debug {
@@ -62,6 +83,13 @@ plan os_patching::patch_batch (
   } else {
     $patching_result = run_task('os_patching::patch_server', $batch,
       _catch_errors => $catch_errors,
+      clean_cache   => $clean_cache,
+      dpkg_params   => $dpkg_params,
+      reboot        => $reboot,
+      security_only => $security_only,
+      timeout       => $timeout,
+      yum_params    => $yum_params,
+      zypper_params => $zypper_params,
     )
 
     if $debug {

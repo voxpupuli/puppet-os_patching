@@ -423,12 +423,19 @@ The following parameters are available in the `os_patching::patch_batch` plan:
 
 * [`batch`](#-os_patching--patch_batch--batch)
 * [`catch_errors`](#-os_patching--patch_batch--catch_errors)
+* [`clean_cache`](#-os_patching--patch_batch--clean_cache)
+* [`debug`](#-os_patching--patch_batch--debug)
+* [`dpkg_params`](#-os_patching--patch_batch--dpkg_params)
 * [`noop_state`](#-os_patching--patch_batch--noop_state)
+* [`reboot`](#-os_patching--patch_batch--reboot)
 * [`run_health_check`](#-os_patching--patch_batch--run_health_check)
+* [`runinterval`](#-os_patching--patch_batch--runinterval)
+* [`security_only`](#-os_patching--patch_batch--security_only)
 * [`service_enabled`](#-os_patching--patch_batch--service_enabled)
 * [`service_running`](#-os_patching--patch_batch--service_running)
-* [`runinterval`](#-os_patching--patch_batch--runinterval)
-* [`debug`](#-os_patching--patch_batch--debug)
+* [`timeout`](#-os_patching--patch_batch--timeout)
+* [`yum_params`](#-os_patching--patch_batch--yum_params)
+* [`zypper_params`](#-os_patching--patch_batch--zypper_params)
 
 ##### <a name="-os_patching--patch_batch--batch"></a>`batch`
 
@@ -444,6 +451,30 @@ Whether to catch errors during task execution
 
 Default value: `true`
 
+##### <a name="-os_patching--patch_batch--clean_cache"></a>`clean_cache`
+
+Data type: `Optional[Boolean]`
+
+Whether to clean the package manager cache before patching
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_batch--debug"></a>`debug`
+
+Data type: `Boolean`
+
+Whether to enable debug output
+
+Default value: `false`
+
+##### <a name="-os_patching--patch_batch--dpkg_params"></a>`dpkg_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for apt/dpkg
+
+Default value: `undef`
+
 ##### <a name="-os_patching--patch_batch--noop_state"></a>`noop_state`
 
 Data type: `Boolean`
@@ -452,6 +483,14 @@ Whether to consider noop state during health check
 
 Default value: `false`
 
+##### <a name="-os_patching--patch_batch--reboot"></a>`reboot`
+
+Data type: `Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]]`
+
+Reboot strategy after patching
+
+Default value: `undef`
+
 ##### <a name="-os_patching--patch_batch--run_health_check"></a>`run_health_check`
 
 Data type: `Boolean`
@@ -459,6 +498,22 @@ Data type: `Boolean`
 Whether to run a health check before patching
 
 Default value: `false`
+
+##### <a name="-os_patching--patch_batch--runinterval"></a>`runinterval`
+
+Data type: `Integer[0]`
+
+The runinterval to use during health check
+
+Default value: `1800`
+
+##### <a name="-os_patching--patch_batch--security_only"></a>`security_only`
+
+Data type: `Optional[Boolean]`
+
+Whether to apply only security updates
+
+Default value: `undef`
 
 ##### <a name="-os_patching--patch_batch--service_enabled"></a>`service_enabled`
 
@@ -476,21 +531,29 @@ Whether the puppet service should be running during health check
 
 Default value: `true`
 
-##### <a name="-os_patching--patch_batch--runinterval"></a>`runinterval`
+##### <a name="-os_patching--patch_batch--timeout"></a>`timeout`
 
-Data type: `Integer[0]`
+Data type: `Optional[Integer[1]]`
 
-The runinterval to use during health check
+The timeout for the patching task
 
-Default value: `1800`
+Default value: `undef`
 
-##### <a name="-os_patching--patch_batch--debug"></a>`debug`
+##### <a name="-os_patching--patch_batch--yum_params"></a>`yum_params`
 
-Data type: `Boolean`
+Data type: `Optional[String]`
 
-Whether to enable debug output
+Additional parameters for yum
 
-Default value: `false`
+Default value: `undef`
+
+##### <a name="-os_patching--patch_batch--zypper_params"></a>`zypper_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for zypper
+
+Default value: `undef`
 
 ### <a name="os_patching--patch_group"></a>`os_patching::patch_group`
 
@@ -500,42 +563,48 @@ Patch nodes collected by a fact group
 
 The following parameters are available in the `os_patching::patch_group` plan:
 
-* [`group`](#-os_patching--patch_group--group)
-* [`patch_in_batches`](#-os_patching--patch_group--patch_in_batches)
 * [`batch_size`](#-os_patching--patch_group--batch_size)
-* [`run_health_check`](#-os_patching--patch_group--run_health_check)
+* [`catch_errors`](#-os_patching--patch_group--catch_errors)
+* [`clean_cache`](#-os_patching--patch_group--clean_cache)
 * [`debug`](#-os_patching--patch_group--debug)
+* [`dpkg_params`](#-os_patching--patch_group--dpkg_params)
+* [`group`](#-os_patching--patch_group--group)
+* [`noop_state`](#-os_patching--patch_group--noop_state)
+* [`patch_in_batches`](#-os_patching--patch_group--patch_in_batches)
 * [`pql_query`](#-os_patching--patch_group--pql_query)
-
-##### <a name="-os_patching--patch_group--group"></a>`group`
-
-Data type: `String[1]`
-
-The fact group name to patch
-
-##### <a name="-os_patching--patch_group--patch_in_batches"></a>`patch_in_batches`
-
-Data type: `Boolean`
-
-Whether to patch nodes in batches
-
-Default value: `true`
+* [`reboot`](#-os_patching--patch_group--reboot)
+* [`run_health_check`](#-os_patching--patch_group--run_health_check)
+* [`runinterval`](#-os_patching--patch_group--runinterval)
+* [`security_only`](#-os_patching--patch_group--security_only)
+* [`service_enabled`](#-os_patching--patch_group--service_enabled)
+* [`service_running`](#-os_patching--patch_group--service_running)
+* [`timeout`](#-os_patching--patch_group--timeout)
+* [`yum_params`](#-os_patching--patch_group--yum_params)
+* [`zypper_params`](#-os_patching--patch_group--zypper_params)
 
 ##### <a name="-os_patching--patch_group--batch_size"></a>`batch_size`
 
-Data type: `Integer[0]`
+Data type: `Integer[1]`
 
 The size of each batch if patching in batches
 
 Default value: `15`
 
-##### <a name="-os_patching--patch_group--run_health_check"></a>`run_health_check`
+##### <a name="-os_patching--patch_group--catch_errors"></a>`catch_errors`
 
 Data type: `Boolean`
 
-Whether to run a health check after patching
+Whether to catch errors during task execution
 
 Default value: `true`
+
+##### <a name="-os_patching--patch_group--clean_cache"></a>`clean_cache`
+
+Data type: `Optional[Boolean]`
+
+Whether to clean the package manager cache before patching
+
+Default value: `undef`
 
 ##### <a name="-os_patching--patch_group--debug"></a>`debug`
 
@@ -545,6 +614,36 @@ Whether to enable debug output
 
 Default value: `false`
 
+##### <a name="-os_patching--patch_group--dpkg_params"></a>`dpkg_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for apt/dpkg
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_group--group"></a>`group`
+
+Data type: `String[1]`
+
+The fact group name to patch
+
+##### <a name="-os_patching--patch_group--noop_state"></a>`noop_state`
+
+Data type: `Boolean`
+
+Whether to consider noop state during health check
+
+Default value: `false`
+
+##### <a name="-os_patching--patch_group--patch_in_batches"></a>`patch_in_batches`
+
+Data type: `Boolean`
+
+Whether to patch nodes in batches
+
+Default value: `true`
+
 ##### <a name="-os_patching--patch_group--pql_query"></a>`pql_query`
 
 Data type: `String[1]`
@@ -552,6 +651,78 @@ Data type: `String[1]`
 The PQL query to retrieve nodes in the group
 
 Default value: `"inventory[certname] { facts.os_patching.group = '${group}'}"`
+
+##### <a name="-os_patching--patch_group--reboot"></a>`reboot`
+
+Data type: `Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]]`
+
+Reboot strategy after patching
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_group--run_health_check"></a>`run_health_check`
+
+Data type: `Boolean`
+
+Whether to run a health check after patching
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_group--runinterval"></a>`runinterval`
+
+Data type: `Integer[0]`
+
+The runinterval to use during health check
+
+Default value: `1800`
+
+##### <a name="-os_patching--patch_group--security_only"></a>`security_only`
+
+Data type: `Optional[Boolean]`
+
+Whether to apply only security updates
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_group--service_enabled"></a>`service_enabled`
+
+Data type: `Boolean`
+
+Whether the puppet service should be enabled during health check
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_group--service_running"></a>`service_running`
+
+Data type: `Boolean`
+
+Whether the puppet service should be running during health check
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_group--timeout"></a>`timeout`
+
+Data type: `Optional[Integer[1]]`
+
+The timeout for the patching task
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_group--yum_params"></a>`yum_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for yum
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_group--zypper_params"></a>`zypper_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for zypper
+
+Default value: `undef`
 
 ### <a name="os_patching--patch_pql"></a>`os_patching::patch_pql`
 
@@ -561,19 +732,71 @@ Patch nodes collected by a PQL query
 
 The following parameters are available in the `os_patching::patch_pql` plan:
 
-* [`pql_query`](#-os_patching--patch_pql--pql_query)
-* [`patch_in_batches`](#-os_patching--patch_pql--patch_in_batches)
 * [`batch_size`](#-os_patching--patch_pql--batch_size)
-* [`run_health_check`](#-os_patching--patch_pql--run_health_check)
+* [`catch_errors`](#-os_patching--patch_pql--catch_errors)
+* [`clean_cache`](#-os_patching--patch_pql--clean_cache)
 * [`debug`](#-os_patching--patch_pql--debug)
+* [`dpkg_params`](#-os_patching--patch_pql--dpkg_params)
+* [`noop_state`](#-os_patching--patch_pql--noop_state)
+* [`patch_in_batches`](#-os_patching--patch_pql--patch_in_batches)
+* [`pql_query`](#-os_patching--patch_pql--pql_query)
+* [`reboot`](#-os_patching--patch_pql--reboot)
+* [`run_health_check`](#-os_patching--patch_pql--run_health_check)
+* [`runinterval`](#-os_patching--patch_pql--runinterval)
+* [`security_only`](#-os_patching--patch_pql--security_only)
+* [`service_enabled`](#-os_patching--patch_pql--service_enabled)
+* [`service_running`](#-os_patching--patch_pql--service_running)
+* [`timeout`](#-os_patching--patch_pql--timeout)
+* [`yum_params`](#-os_patching--patch_pql--yum_params)
+* [`zypper_params`](#-os_patching--patch_pql--zypper_params)
 
-##### <a name="-os_patching--patch_pql--pql_query"></a>`pql_query`
+##### <a name="-os_patching--patch_pql--batch_size"></a>`batch_size`
 
-Data type: `String[1]`
+Data type: `Integer[1]`
 
-The PQL query to retrieve nodes to patch
+The size of each batch if patching in batches
 
-Default value: `'inventory[certname] { facts.os.family = "redhat" }'`
+Default value: `15`
+
+##### <a name="-os_patching--patch_pql--catch_errors"></a>`catch_errors`
+
+Data type: `Boolean`
+
+Whether to catch errors during task execution
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_pql--clean_cache"></a>`clean_cache`
+
+Data type: `Optional[Boolean]`
+
+Whether to clean the package manager cache before patching
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_pql--debug"></a>`debug`
+
+Data type: `Boolean`
+
+Whether to enable debug output
+
+Default value: `false`
+
+##### <a name="-os_patching--patch_pql--dpkg_params"></a>`dpkg_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for apt/dpkg
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_pql--noop_state"></a>`noop_state`
+
+Data type: `Boolean`
+
+Whether to consider noop state during health check
+
+Default value: `false`
 
 ##### <a name="-os_patching--patch_pql--patch_in_batches"></a>`patch_in_batches`
 
@@ -583,13 +806,21 @@ Whether to patch nodes in batches
 
 Default value: `true`
 
-##### <a name="-os_patching--patch_pql--batch_size"></a>`batch_size`
+##### <a name="-os_patching--patch_pql--pql_query"></a>`pql_query`
 
-Data type: `Integer[0]`
+Data type: `String[1]`
 
-The size of each batch if patching in batches
+The PQL query to retrieve nodes to patch
 
-Default value: `15`
+Default value: `'inventory[certname] { facts.os.family = "redhat" }'`
+
+##### <a name="-os_patching--patch_pql--reboot"></a>`reboot`
+
+Data type: `Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]]`
+
+Reboot strategy after patching
+
+Default value: `undef`
 
 ##### <a name="-os_patching--patch_pql--run_health_check"></a>`run_health_check`
 
@@ -599,11 +830,59 @@ Whether to run a health check after patching
 
 Default value: `true`
 
-##### <a name="-os_patching--patch_pql--debug"></a>`debug`
+##### <a name="-os_patching--patch_pql--runinterval"></a>`runinterval`
+
+Data type: `Integer[0]`
+
+The runinterval to use during health check
+
+Default value: `1800`
+
+##### <a name="-os_patching--patch_pql--security_only"></a>`security_only`
+
+Data type: `Optional[Boolean]`
+
+Whether to apply only security updates
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_pql--service_enabled"></a>`service_enabled`
 
 Data type: `Boolean`
 
-Whether to enable debug output
+Whether the puppet service should be enabled during health check
 
-Default value: `false`
+Default value: `true`
+
+##### <a name="-os_patching--patch_pql--service_running"></a>`service_running`
+
+Data type: `Boolean`
+
+Whether the puppet service should be running during health check
+
+Default value: `true`
+
+##### <a name="-os_patching--patch_pql--timeout"></a>`timeout`
+
+Data type: `Optional[Integer[1]]`
+
+The timeout for the patching task
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_pql--yum_params"></a>`yum_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for yum
+
+Default value: `undef`
+
+##### <a name="-os_patching--patch_pql--zypper_params"></a>`zypper_params`
+
+Data type: `Optional[String]`
+
+Additional parameters for zypper
+
+Default value: `undef`
 
