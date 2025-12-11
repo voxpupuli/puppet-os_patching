@@ -106,7 +106,7 @@ The following parameters are available in the `os_patching` class:
 * [`block_patching_on_warnings`](#-os_patching--block_patching_on_warnings)
 * [`yum_utils`](#-os_patching--yum_utils)
 * [`fact_upload`](#-os_patching--fact_upload)
-* [`apt_autoremove`](#-os_patching--apt_autoremove)
+* [`autoremove`](#-os_patching--autoremove)
 * [`manage_delta_rpm`](#-os_patching--manage_delta_rpm)
 * [`delta_rpm`](#-os_patching--delta_rpm)
 * [`manage_yum_plugin_security`](#-os_patching--manage_yum_plugin_security)
@@ -125,6 +125,7 @@ The following parameters are available in the `os_patching` class:
 * [`fact_mode`](#-os_patching--fact_mode)
 * [`ensure`](#-os_patching--ensure)
 * [`group`](#-os_patching--group)
+* [`autoremove_delay_sec`](#-os_patching--autoremove_delay_sec)
 
 ##### <a name="-os_patching--puppet_binary"></a>`puppet_binary`
 
@@ -177,11 +178,11 @@ Data type: `Boolean`
 
 Should `puppet fact upload` be run after any changes to the fact cache files?
 
-##### <a name="-os_patching--apt_autoremove"></a>`apt_autoremove`
+##### <a name="-os_patching--autoremove"></a>`autoremove`
 
 Data type: `Boolean`
 
-Should `apt-get autoremove` be run during reboot?
+Should autoremove via the package manager be run after reboot? Only supported on Debian and RedHat family nodes.
 
 ##### <a name="-os_patching--manage_delta_rpm"></a>`manage_delta_rpm`
 
@@ -309,6 +310,12 @@ Data type: `Optional[Pattern[/^[A-Za-z0-9\-_ ]+$/]]`
 The group to assign the node for patching purposes.
 
 Default value: `undef`
+
+##### <a name="-os_patching--autoremove_delay_sec"></a>`autoremove_delay_sec`
+
+Data type: `Integer`
+
+The number of seconds to wait after boot before running autoremove
 
 ## Tasks
 

@@ -1,2 +1,0 @@
----
-os_patching::apt_autoremove: false
