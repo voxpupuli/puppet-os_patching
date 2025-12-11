@@ -376,7 +376,7 @@ class os_patching (
           refreshonly => true,
           require     => [
             File[$fact_cmd],
-            File["${cache_dir}/reboot_override"]
+            File["${cache_dir}/reboot_override"],
           ],
         }
       }
