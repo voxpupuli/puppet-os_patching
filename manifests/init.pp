@@ -28,8 +28,8 @@
 # @param fact_upload [Boolean]
 #   Should `puppet fact upload` be run after any changes to the fact cache files?
 #
-# @param apt_autoremove [Boolean]
-#   Should `apt-get autoremove` be run during reboot?
+# @param autoremove [Boolean]
+#   Should autoremove via the package manager be run after reboot? Only supported on Debian and RedHat family nodes.
 #
 # @param manage_delta_rpm [Boolean]
 #   Should the deltarpm package be managed by this module on RedHat family nodes?
@@ -99,6 +99,9 @@
 # @param group
 #   The group to assign the node for patching purposes.
 #
+# @param autoremove_delay_sec
+#   The number of seconds to wait after boot before running autoremove
+#
 # @example assign node to 'Week3' patching window, force a reboot and create a blackout window for the end of the year
 #   class { 'os_patching':
 #     patch_window     => 'Week3',
@@ -155,7 +158,8 @@ class os_patching (
   Boolean $manage_yum_plugin_security,
   Boolean $fact_upload,
   Boolean $block_patching_on_warnings,
-  Boolean $apt_autoremove,
+  Boolean $autoremove,
+  Integer $autoremove_delay_sec,
   Integer[0,23] $windows_update_hour,
   Integer $windows_update_interval_mins,
   Stdlib::Filemode $fact_mode,
@@ -225,7 +229,7 @@ class os_patching (
     notify => Exec[$fact_exec],
   }
 
-  $autoremove_ensure = $apt_autoremove ? {
+  $autoremove_ensure = $autoremove ? {
     true    => 'present',
     default => 'absent'
   }
@@ -397,12 +401,22 @@ class os_patching (
         require => File[$fact_cmd],
       }
 
-      if $facts['os']['family'] == 'Debian' {
+      if $facts['os']['family'] in ['Debian', 'RedHat'] and $autoremove {
+        $autoremove_command = $facts['os']['family'] ? {
+          'Debian' => 'apt-get -y --purge autoremove',
+          'RedHat' => 'yum -y autoremove',
+        }
+
+        systemd::timer_wrapper { 'autoremove':
+          ensure      => $autoremove_ensure,
+          command     => $autoremove_command,
+          user        => $patch_cron_user,
+          on_boot_sec => $autoremove_delay_sec,
+        }
+
         cron { 'Run apt autoremove on reboot':
-          ensure  => $autoremove_ensure,
-          command => 'apt-get -y autoremove',
-          user    => $patch_cron_user,
-          special => 'reboot',
+          ensure => absent,
+          user   => $patch_cron_user,
         }
       }
     }

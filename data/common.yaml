@@ -4,7 +4,8 @@ os_patching::pre_patching_command: NULL
 os_patching::block_patching_on_warnings: false
 os_patching::reboot_override: 'default'
 os_patching::ensure: 'present'
-os_patching::apt_autoremove: false
+os_patching::autoremove: false
+os_patching::autoremove_delay_sec: 300
 os_patching::delta_rpm: 'installed'
 os_patching::manage_delta_rpm: false
 os_patching::manage_yum_plugin_security: false
