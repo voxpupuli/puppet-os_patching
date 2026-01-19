@@ -46,7 +46,7 @@ case $OSFAMILY in
     PKGS=$(echo $PKGS | sed 's/Obsoleting.*//')
     SECPKGS=$(yum -q --security check-update 2>/dev/null| grep -E -v "^Security:" | grep -oP '^.*?(?= )')
     SECPKGS=$(echo $SECPKGS | sed 's/Obsoleting.*//')
-    HELDPKGS=$([ -r /etc/yum/pluginconf.d/versionlock.list ] && awk -F':' '/:/ {print $2}' /etc/yum/pluginconf.d/versionlock.list | sed 's/-[0-9].*//')
+    HELDPKGS=$([ -r /etc/yum/pluginconf.d/versionlock.list ] && awk -F':' '/:/ {print $1}' /etc/yum/pluginconf.d/versionlock.list | sed 's/-[0-9].*//')
   ;;
   Suse)
     PKGS=$(zypper --non-interactive --no-abbrev --quiet lu | grep '|' | grep -v '\sRepository' | awk -F'|' '/^[[:alnum:]]/ {print $3}' | sed 's/^\s*\|\s*$//')
