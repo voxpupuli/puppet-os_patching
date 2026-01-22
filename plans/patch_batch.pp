@@ -55,58 +55,58 @@ plan os_patching::patch_batch (
     }
 
     # get nodes that are 'clean' from health check results
-    $nodes_to_patch = ($health_checks.filter_set |$item| { $item.value['state'] == 'clean' }).map |$n| { $n.target }
-    $skipped_nodes  = ($health_checks.filter_set |$item| { $item.status == 'failure' }).map |$n| { $n.target }
+    $nodes_to_patch      = ($health_checks.filter_set |$item| { $item.value['state'] == 'clean' }).map |$n| { $n.target }
+    $health_check_failed = ($health_checks.filter_set |$item| { $item.status == 'failure' }).map |$n| { $n.target }
 
     if $debug {
       out::message('patch_batch.pp: Nodes to patch after health check:')
       out::message($nodes_to_patch)
       out::message('patch_batch.pp: Skipped nodes after health check:')
-      out::message($skipped_nodes)
-    }
-
-    $patching_result = run_task('os_patching::patch_server', $nodes_to_patch,
-      _catch_errors => $catch_errors,
-      clean_cache   => $clean_cache,
-      dpkg_params   => $dpkg_params,
-      reboot        => $reboot,
-      security_only => $security_only,
-      timeout       => $timeout,
-      yum_params    => $yum_params,
-      zypper_params => $zypper_params,
-    )
-
-    if $debug {
-      out::message('patch_batch.pp: Patching results:')
-      out::message($patching_result)
+      out::message($health_check_failed)
     }
   } else {
-    $patching_result = run_task('os_patching::patch_server', $batch,
-      _catch_errors => $catch_errors,
-      clean_cache   => $clean_cache,
-      dpkg_params   => $dpkg_params,
-      reboot        => $reboot,
-      security_only => $security_only,
-      timeout       => $timeout,
-      yum_params    => $yum_params,
-      zypper_params => $zypper_params,
-    )
-
-    if $debug {
-      out::message('patch_batch.pp: Patching results:')
-      out::message($patching_result)
-    }
-
-    $skipped_nodes            = [] # No skipped nodes if health check is not run
+    $nodes_to_patch      = $batch
+    $health_check_failed = []
   }
 
-  return(
-    {
-      targets      => $batch,
-      patched      => $patching_result.ok_set.names,
-      failed       => $patching_result.error_set.names,
-      skipped      => $skipped_nodes,
-      health_check => $run_health_check,
-    }
+  $patching_result = run_task('os_patching::patch_server', $nodes_to_patch,
+    _catch_errors => $catch_errors,
+    clean_cache   => $clean_cache,
+    dpkg_params   => $dpkg_params,
+    reboot        => $reboot,
+    security_only => $security_only,
+    timeout       => $timeout,
+    yum_params    => $yum_params,
+    zypper_params => $zypper_params,
   )
+
+  if $debug {
+    out::message('patch_batch.pp: Patching results:')
+    out::message($patching_result)
+  }
+
+  $no_patches = $patching_result.ok_set.filter |$item| {
+    $item.value['packages_updated'].empty
+  }.map |$n| { $n.target }
+
+  $with_patches = $patching_result.ok_set.filter |$item| {
+    ! $item.value['packages_updated'].empty
+  }.map |$n| { $n.target }
+
+  $reboot_required = $patching_result.ok_set.filter |$item| {
+    $item.value['reboot_required'] == true
+  }.map |$n| { $n.target }
+
+  $output = {
+    failed              => $patching_result.error_set.names,
+    health_check        => $run_health_check,
+    health_check_failed => $health_check_failed,
+    no_patches          => $no_patches,
+    reboot_pattern      => $reboot,
+    reboot_required     => $reboot_required,
+    targets             => $batch,
+    with_patches        => $with_patches,
+  }
+
+  return($output)
 }
