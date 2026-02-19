@@ -45,6 +45,8 @@ plan os_patching::patch_group (
   $certnames = $pql_data.map |$item| { $item['certname'] }
   $targets   = get_targets($certnames)
 
+  if empty($targets) { fail("No nodes found in group '${group}' with query '${pql_query}'") }
+
   out::message("patch_group.pp: Patching group: ${group}")
   out::message("patch_group.pp: Targets in group: ${targets}")
   out::message("patch_group.pp: Patching in batches is ${patch_in_batches}")
