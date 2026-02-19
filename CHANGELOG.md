@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v3.0.0](https://github.com/voxpupuli/puppet-os_patching/tree/v3.0.0) (2026-02-19)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v2.0.0...v3.0.0)
+
+**Breaking changes:**
+
+- refactor: rename output fields to better match their purpose, add pending linux reboots [\#267](https://github.com/voxpupuli/puppet-os_patching/pull/267) ([rwaffen](https://github.com/rwaffen))
+- feat: update autoremove to work on Debian and RedHat with systemd-timer [\#264](https://github.com/voxpupuli/puppet-os_patching/pull/264) ([rwaffen](https://github.com/rwaffen))
+
+**Implemented enhancements:**
+
+- feat: fail on empty node sets [\#269](https://github.com/voxpupuli/puppet-os_patching/pull/269) ([rwaffen](https://github.com/rwaffen))
+- fix: update apt command to allow release info changes and set non-interactive mode [\#268](https://github.com/voxpupuli/puppet-os_patching/pull/268) ([rwaffen](https://github.com/rwaffen))
+- feat: add all options of all sub-plans/tasks to group/psql patching [\#261](https://github.com/voxpupuli/puppet-os_patching/pull/261) ([rwaffen](https://github.com/rwaffen))
+
+**Closed issues:**
+
+- combine additional \_params \(dpkg,yum,zypper\) parameter into one [\#263](https://github.com/voxpupuli/puppet-os_patching/issues/263)
+
 ## [v2.0.0](https://github.com/voxpupuli/puppet-os_patching/tree/v2.0.0) (2025-11-13)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v1.0.0...v2.0.0)
