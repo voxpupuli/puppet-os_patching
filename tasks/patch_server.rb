@@ -19,7 +19,7 @@ if IS_WINDOWS
   # set paths/commands for windows
   fact_generation_script = 'C:/ProgramData/os_patching/os_patching_fact_generation.ps1'
   fact_generation_cmd = "#{ENV['systemroot']}/system32/WindowsPowerShell/v1.0/powershell.exe -ExecutionPolicy RemoteSigned -file #{fact_generation_script}"
-  puppet_cmd = "#{ENV['programfiles']}/Puppet Labs/Puppet/bin/puppet"
+  @puppet_cmd = "#{ENV['programfiles']}/Puppet Labs/Puppet/bin/puppet"
   shutdown_cmd = 'shutdown /r /t 60 /c "Rebooting due to the installation of updates by os_patching" /d p:2:17'
 else
   # not windows
@@ -29,7 +29,7 @@ else
   # set paths/commands for linux
   fact_generation_script = '/usr/local/bin/os_patching_fact_generation.sh'
   fact_generation_cmd = fact_generation_script
-  puppet_cmd = '/opt/puppetlabs/puppet/bin/puppet'
+  @puppet_cmd = '/opt/puppetlabs/puppet/bin/puppet'
   shutdown_cmd = 'nohup /sbin/shutdown -r +1 2>/dev/null 1>/dev/null &'
 
   ENV['LC_ALL'] = 'C'
@@ -134,8 +134,31 @@ def pending_reboot_win
   end
 end
 
+def pending_reboot_linux(log, starttime)
+  facts = gather_facts(log, starttime)
+
+  # check for existence of /var/run/reboot-required file
+  if facts['os']['family'] == 'RedHat'
+    if File.file?('/usr/bin/needs-restarting')
+      _output, _stderr, status = Open3.capture3('/usr/bin/needs-restarting -r')
+      return true if status != 0
+    else
+      log.warn 'needs-restarting command not found, cannot determine if reboot is required'
+      log.warn 'please install the yum-util/dnf-utils package to enable this functionality'
+    end
+
+    return false
+  end
+
+  if File.file?('/var/run/reboot-required')
+    true
+  else
+    false
+  end
+end
+
 # Default output function
-def output(returncode, reboot, security, message, packages_updated, debug, job_id, pinned_packages, starttime)
+def output(returncode, reboot, security, message, packages_updated, debug, job_id, pinned_packages, starttime, log)
   endtime = Time.now.iso8601
   json = {
     :return           => returncode,
@@ -148,7 +171,12 @@ def output(returncode, reboot, security, message, packages_updated, debug, job_i
     :pinned_packages  => pinned_packages,
     :start_time       => starttime,
     :end_time         => endtime,
+    :duration         => Time.parse(endtime) - Time.parse(starttime)
   }
+
+  json[:reboot_required] = pending_reboot_win if IS_WINDOWS
+  json[:reboot_required] = pending_reboot_linux(log, starttime) unless IS_WINDOWS
+
   puts JSON.pretty_generate(json)
   history(starttime, message, returncode, reboot, security, job_id)
 end
@@ -235,6 +263,15 @@ def reboot_required(family, release, reboot)
   end
 end
 
+def gather_facts(log, starttime)
+  # Cache the facts
+  log.debug 'Gathering facts'
+  full_facts, stderr, status = Open3.capture3(@puppet_cmd, 'facts')
+  err(status, 'os_patching/facter', stderr, starttime) if status != 0
+
+  JSON.parse(full_facts)
+end
+
 # Parse input, get params in scope
 params = nil
 begin
@@ -259,10 +296,7 @@ unless File.exist? fact_generation_script
 end
 
 # Cache the facts
-log.debug 'Gathering facts'
-full_facts, stderr, status = Open3.capture3(puppet_cmd, 'facts')
-err(status, 'os_patching/facter', stderr, starttime) if status != 0
-facts = JSON.parse(full_facts)
+facts = gather_facts(log, starttime)
 
 if facts['os']
   os = facts['os']
@@ -450,7 +484,7 @@ end
 if updatecount.zero?
   if reboot == 'always'
     log.error 'Rebooting'
-    output('Success', reboot, security_only, 'No patches to apply, reboot triggered', '', '', '', pinned_pkgs, starttime)
+    output('Success', reboot, security_only, 'No patches to apply, reboot triggered', '', '', '', pinned_pkgs, starttime, log)
     $stdout.flush
     log.info 'No patches to apply, rebooting as requested'
     p1 = if IS_WINDOWS
@@ -460,7 +494,7 @@ if updatecount.zero?
          end
     Process.detach(p1)
   else
-    output('Success', reboot, security_only, 'No patches to apply', '', '', '', pinned_pkgs, starttime)
+    output('Success', reboot, security_only, 'No patches to apply', '', '', '', pinned_pkgs, starttime, log)
     log.info 'No patches to apply, exiting'
   end
   exit(0)
@@ -535,7 +569,7 @@ if os['family'] == 'RedHat'
     pkg_hash = {}
   end
 
-  output(yum_return, reboot, security_only, 'Patching complete', pkg_hash, output, job, pinned_pkgs, starttime)
+  output(yum_return, reboot, security_only, 'Patching complete', pkg_hash, output, job, pinned_pkgs, starttime, log)
   log.info 'Patching complete'
 elsif os['family'] == 'Debian'
   # Are we doing security only patching?
@@ -556,7 +590,7 @@ elsif os['family'] == 'Debian'
   apt_std_out, stderr, status = Open3.capture3("#{deb_front} apt-get #{dpkg_params} -y #{deb_opts} #{apt_mode}")
   err(status, 'os_patching/apt', stderr, starttime) if status != 0
 
-  output('Success', reboot, security_only, 'Patching complete', pkg_list, apt_std_out, '', pinned_pkgs, starttime)
+  output('Success', reboot, security_only, 'Patching complete', pkg_list, apt_std_out, '', pinned_pkgs, starttime, log)
   log.info 'Patching complete'
 elsif os['family'] == 'windows'
   # we're on windows
@@ -615,7 +649,7 @@ elsif os['family'] == 'windows'
 
   # output results
   # def output(returncode, reboot, security, message, packages_updated, debug, job_id, pinned_packages, starttime)
-  output('Success', reboot, security_only, 'Patching complete', update_titles, win_std_out.split("\n"), '', '', starttime)
+  output('Success', reboot, security_only, 'Patching complete', update_titles, win_std_out.split("\n"), '', '', starttime, log)
 
 elsif os['family'] == 'Suse'
   zypper_required_params = '--non-interactive --no-abbrev --quiet'
@@ -635,7 +669,7 @@ elsif os['family'] == 'Suse'
     status, output = run_with_timeout("zypper #{zypper_required_params} #{zypper_params} update -t package #{zypper_cmd_params}", timeout, 2)
     err(status, 'os_patching/zypper', "zypper update returned non-zero (#{status}) : #{output}", starttime) if status != 0
   end
-  output('Success', reboot, security_only, 'Patching complete', pkg_list, output, '', pinned_pkgs, starttime)
+  output('Success', reboot, security_only, 'Patching complete', pkg_list, output, '', pinned_pkgs, starttime, log)
   log.info 'Patching complete'
   log.debug "Timeout value set to : #{timeout}"
 else

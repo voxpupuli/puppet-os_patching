@@ -80,11 +80,14 @@ plan os_patching::patch_group (
 
     # Merge all batch results into a single hash by combining arrays
     $result = {
-      'targets'      => $batch_results.map |$r| { $r['targets'] }.flatten,
-      'patched'      => $batch_results.map |$r| { $r['patched'] }.flatten,
-      'failed'       => $batch_results.map |$r| { $r['failed'] }.flatten,
-      'skipped'      => $batch_results.map |$r| { $r['skipped'] }.flatten,
-      'health_check' => $batch_results[0]['health_check'],
+      failed              => $batch_results.map |$r| { $r['failed'] }.flatten,
+      health_check        => $batch_results[0]['health_check'],
+      health_check_failed => $batch_results.map |$r| { $r['health_check_failed'] }.flatten,
+      no_patches          => $batch_results.map |$r| { $r['no_patches'] }.flatten,
+      reboot_pattern      => $batch_results[0]['reboot_pattern'],
+      reboot_required     => $batch_results.map |$r| { $r['reboot_required'] }.flatten,
+      targets             => $batch_results.map |$r| { $r['targets'] }.flatten,
+      with_patches        => $batch_results.map |$r| { $r['with_patches'] }.flatten,
     }
   } else {
     out::message("patch_group.pp: Patching all targets at once: ${targets}")
