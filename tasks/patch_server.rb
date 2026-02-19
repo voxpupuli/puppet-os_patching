@@ -141,17 +141,13 @@ def pending_reboot_linux(log, starttime)
   if facts['os']['family'] == 'RedHat'
     if File.file?('/usr/bin/needs-restarting')
       _output, _stderr, status = Open3.capture3('/usr/bin/needs-restarting -r')
-      if status != 0
-        return true
-      else
-        return false
-      end
+      return true if status != 0
     else
       log.warn 'needs-restarting command not found, cannot determine if reboot is required'
       log.warn 'please install the yum-util/dnf-utils package to enable this functionality'
-      # needs-restart doesn't exist so assume it is not needed
-      return false
     end
+
+    return false
   end
 
   if File.file?('/var/run/reboot-required')
