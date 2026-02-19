@@ -54,7 +54,8 @@ case $OSFAMILY in
     HELDPKGS=$(zypper --non-interactive --no-abbrev --quiet ll | grep '|' | grep -v '^Repository' | awk -F'|' '/^[[:alnum:]]/ {print $2}' | sed 's/^\s*\|\s*$//')
   ;;
   Debian)
-    apt update 2>/dev/null 1>/dev/null
+    export DEBIAN_FRONTEND=noninteractive
+    apt update --allow-releaseinfo-change &>/dev/null
     PKGS=$(apt upgrade -s 2>/dev/null | awk '$1 == "Inst" {print $2}')
     SECPKGS=$(apt upgrade -s 2>/dev/null | awk 'BEGIN {IGNORECASE = 1}; $1 == "Inst" && /Security/ {print $2}')
     HELDPKGS=$(dpkg --get-selections | awk '$2 == "hold" {print $1}')
