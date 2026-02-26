@@ -429,14 +429,11 @@ if zypper_params =~ %r{[\$\|\/;`&]}
   err('110', 'os_patching/zypper_params', 'Unsafe content in zypper_params', starttime)
 end
 # Set the timeout for the patch run
-if params['timeout']
-  if params['timeout'] > 0
-    timeout = params['timeout']
-  else
-    err('121', 'os_patching/timeout', "timeout set to #{timeout} seconds - invalid", starttime)
-  end
+
+if params['timeout'].positive?
+  timeout = params['timeout']
 else
-  timeout = 3600
+  err('121', 'os_patching/timeout', "timeout set to #{timeout} seconds - invalid", starttime)
 end
 
 # Is the patching blocker flag set?
@@ -573,8 +570,6 @@ if os['family'] == 'RedHat'
   log.info 'Patching complete'
 elsif os['family'] == 'Debian'
   # Are we doing security only patching?
-  apt_mode = ''
-  pkg_list = []
   if security_only == true
     pkg_list = os_patching['security_package_updates']
     apt_mode = 'install ' + pkg_list.join(' ')
@@ -587,8 +582,8 @@ elsif os['family'] == 'Debian'
   log.debug "Running apt #{apt_mode}"
   deb_front = 'DEBIAN_FRONTEND=noninteractive'
   deb_opts = '-o Apt::Get::Purge=false -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef --no-install-recommends'
-  apt_std_out, stderr, status = Open3.capture3("#{deb_front} apt-get #{dpkg_params} -y #{deb_opts} #{apt_mode}")
-  err(status, 'os_patching/apt', stderr, starttime) if status != 0
+  apt_std_out, status = run_with_timeout("#{deb_front} apt-get #{dpkg_params} -y #{deb_opts} #{apt_mode}", timeout, 2)
+  err(status, 'os_patching/apt', apt_std_out, starttime) if status != 0
 
   output('Success', reboot, security_only, 'Patching complete', pkg_list, apt_std_out, '', pinned_pkgs, starttime, log)
   log.info 'Patching complete'
