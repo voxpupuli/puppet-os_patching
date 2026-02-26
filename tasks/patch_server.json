@@ -15,19 +15,23 @@
     },
     "reboot": {
       "description": "Should the server reboot after patching has been applied? (Defaults to 'never')",
-      "type": "Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]]"
+      "type": "Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]",
+      "default": "never"
     },
     "timeout": {
       "description": "How many seconds should we wait until timing out the patch run? (Defaults to 3600 seconds)",
-      "type": "Optional[Integer]"
+      "type": "Integer",
+      "default": 3600
     },
     "security_only": {
       "description": "Limit patches to those tagged as security related? (Defaults to false)",
-      "type": "Optional[Boolean]"
+      "type": "Boolean",
+      "default": false
     },
     "clean_cache": {
       "description": "Should the yum/dpkg caches be cleaned at the start of the task? (Defaults to false)",
-      "type": "Optional[Boolean]"
+      "type": "Boolean",
+      "default": false
     }
   },
   "implementations": [

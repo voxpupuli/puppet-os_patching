@@ -353,25 +353,25 @@ Any additional parameters to include in the zypper update command
 
 ##### `reboot`
 
-Data type: `Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]]`
+Data type: `Variant[Boolean, Enum['always', 'never', 'patched', 'smart']]`
 
 Should the server reboot after patching has been applied? (Defaults to 'never')
 
 ##### `timeout`
 
-Data type: `Optional[Integer]`
+Data type: `Integer`
 
 How many seconds should we wait until timing out the patch run? (Defaults to 3600 seconds)
 
 ##### `security_only`
 
-Data type: `Optional[Boolean]`
+Data type: `Boolean`
 
 Limit patches to those tagged as security related? (Defaults to false)
 
 ##### `clean_cache`
 
-Data type: `Optional[Boolean]`
+Data type: `Boolean`
 
 Should the yum/dpkg caches be cleaned at the start of the task? (Defaults to false)
 
