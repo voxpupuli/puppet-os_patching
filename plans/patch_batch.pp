@@ -97,6 +97,8 @@ plan os_patching::patch_batch (
     $item.value['reboot_required'] == true
   }.map |$n| { $n.target }
 
+  $targets = get_targets($batch).map |$t| { $t.name }.sort
+
   $output = {
     failed              => $patching_result.error_set.names,
     health_check        => $run_health_check,
@@ -104,7 +106,7 @@ plan os_patching::patch_batch (
     no_patches          => $no_patches,
     reboot_pattern      => $reboot,
     reboot_required     => $reboot_required,
-    targets             => $batch,
+    targets             => $targets,
     with_patches        => $with_patches,
   }
 
