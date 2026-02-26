@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v3.0.1](https://github.com/voxpupuli/puppet-os_patching/tree/v3.0.1) (2026-02-26)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.0.0...v3.0.1)
+
+**Fixed bugs:**
+
+- fix: return list of names instead of TargetSpec [\#271](https://github.com/voxpupuli/puppet-os_patching/pull/271) ([rwaffen](https://github.com/rwaffen))
+
 ## [v3.0.0](https://github.com/voxpupuli/puppet-os_patching/tree/v3.0.0) (2026-02-19)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v2.0.0...v3.0.0)
