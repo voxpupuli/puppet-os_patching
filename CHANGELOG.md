@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v3.1.0](https://github.com/voxpupuli/puppet-os_patching/tree/v3.1.0) (2026-03-05)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.0.1...v3.1.0)
+
+**Implemented enhancements:**
+
+- feat: set timeout for apt like with dnf and zypper [\#274](https://github.com/voxpupuli/puppet-os_patching/pull/274) ([rwaffen](https://github.com/rwaffen))
+
+**Fixed bugs:**
+
+- fix: use filter\_set and then the `.names` methode [\#276](https://github.com/voxpupuli/puppet-os_patching/pull/276) ([rwaffen](https://github.com/rwaffen))
+- fix: return only arrays with names\(strings\) instead of TargetSpecs/ResultSpecs [\#275](https://github.com/voxpupuli/puppet-os_patching/pull/275) ([rwaffen](https://github.com/rwaffen))
+- fix: Parse versionlocked packages properly for RHEL 8+ [\#266](https://github.com/voxpupuli/puppet-os_patching/pull/266) ([jordyb6](https://github.com/jordyb6))
+
 ## [v3.0.1](https://github.com/voxpupuli/puppet-os_patching/tree/v3.0.1) (2026-02-26)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.0.0...v3.0.1)
