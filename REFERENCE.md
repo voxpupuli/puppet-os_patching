@@ -359,7 +359,7 @@ Should the server reboot after patching has been applied? (Defaults to 'never')
 
 ##### `timeout`
 
-Data type: `Optional[Integer]`
+Data type: `Integer`
 
 How many seconds should we wait until timing out the patch run? (Defaults to 3600 seconds)
 

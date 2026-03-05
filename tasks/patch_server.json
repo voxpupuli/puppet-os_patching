@@ -19,7 +19,8 @@
     },
     "timeout": {
       "description": "How many seconds should we wait until timing out the patch run? (Defaults to 3600 seconds)",
-      "type": "Optional[Integer]"
+      "type": "Integer",
+      "default": 3600
     },
     "security_only": {
       "description": "Limit patches to those tagged as security related? (Defaults to false)",
