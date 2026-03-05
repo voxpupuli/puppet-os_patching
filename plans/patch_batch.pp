@@ -89,6 +89,12 @@ plan os_patching::patch_batch (
   $with_patches    = $patching_result.ok_set.filter_set |$item| { ! $item.value['packages_updated'].empty }.names
   $reboot_required = $patching_result.ok_set.filter_set |$item| { $item.value['reboot_required'] == true }.names
 
+  if $debug {
+    out::message(type($no_patches))
+    out::message(type($with_patches))
+    out::message(type($reboot_required))
+    out::message(type($health_check_failed))
+  }
   $targets = get_targets($batch).map |$t| { $t.name }.sort
 
   $output = {
