@@ -56,7 +56,7 @@ plan os_patching::patch_batch (
 
     # get nodes that are 'clean' from health check results
     $nodes_to_patch      = ($health_checks.filter_set |$item| { $item.value['state'] == 'clean' }).map |$n| { $n.target }
-    $health_check_failed = ($health_checks.filter_set |$item| { $item.status == 'failure' }).map |$n| { $n.name }.sort
+    $health_check_failed = ($health_checks.filter_set |$item| { $item.status == 'failure' }).names
 
     if $debug {
       out::message('patch_batch.pp: Nodes to patch after health check:')
@@ -85,32 +85,14 @@ plan os_patching::patch_batch (
     out::message($patching_result)
   }
 
-  $_no_patches = $patching_result.ok_set.filter |$item| { $item.value['packages_updated'].empty }
-  $no_patches = if empty($_no_patches) {
-                  []
-                } else {
-                  out::message($_no_patches)
-                  $_no_patches.map |$n| { $n.name }.sort
-                }
-
-  $_with_patches = $patching_result.ok_set.filter |$item| { ! $item.value['packages_updated'].empty }
-  $with_patches = if empty($_with_patches) {
-                    []
-                  } else {
-                    $_with_patches.map |$n| { $n.name }.sort
-                  }
-
-  $_reboot_required = $patching_result.ok_set.filter |$item| { $item.value['reboot_required'] == true }
-  $reboot_required = if empty($_reboot_required) {
-                       []
-                     } else {
-                       $_reboot_required.map |$n| { $n.name }.sort
-                     }
+  $no_patches      = $patching_result.ok_set.filter_set |$item| { $item.value['packages_updated'].empty }.names
+  $with_patches    = $patching_result.ok_set.filter_set |$item| { ! $item.value['packages_updated'].empty }.names
+  $reboot_required = $patching_result.ok_set.filter_set |$item| { $item.value['reboot_required'] == true }.names
 
   $targets = get_targets($batch).map |$t| { $t.name }.sort
 
   $output = {
-    failed              => $patching_result.error_set.names.sort,
+    failed              => $patching_result.error_set.names,
     health_check        => $run_health_check,
     health_check_failed => $health_check_failed,
     no_patches          => $no_patches,
