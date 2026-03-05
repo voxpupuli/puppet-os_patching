@@ -89,6 +89,7 @@ plan os_patching::patch_batch (
   $no_patches = if empty($_no_patches) {
                   []
                 } else {
+                  out::message($_no_patches)
                   $_no_patches.map |$n| { $n.name }.sort
                 }
 
