@@ -171,7 +171,7 @@ def output(returncode, reboot, security, message, packages_updated, debug, job_i
     :pinned_packages  => pinned_packages,
     :start_time       => starttime,
     :end_time         => endtime,
-    :duration         => Time.parse(endtime) - Time.parse(starttime)
+    :duration         => Time.parse(endtime) - Time.parse(starttime),
   }
 
   json[:reboot_required] = pending_reboot_win if IS_WINDOWS
@@ -309,7 +309,7 @@ else
 end
 
 # Check we are on a supported platform
-unless os['family'] == 'RedHat' || os['family'] == 'Debian' || os['family'] == 'Suse' || os['family'] == 'windows'
+unless ['RedHat', 'Debian', 'Suse', 'windows'].include?(os['family'])
   err(200, 'os_patching/unsupported_os', 'Unsupported OS', starttime)
 end
 
