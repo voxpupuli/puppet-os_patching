@@ -139,11 +139,15 @@ Data type: `String`
 
 User name for the owner of the patch data
 
+Default value: `'root'`
+
 ##### <a name="-os_patching--patch_data_group"></a>`patch_data_group`
 
 Data type: `String`
 
 Group name for the owner of the patch data
+
+Default value: `'root'`
 
 ##### <a name="-os_patching--patch_cron_user"></a>`patch_cron_user`
 
@@ -151,12 +155,16 @@ Data type: `String`
 
 User who runs the cron job
 
+Default value: `'root'`
+
 ##### <a name="-os_patching--manage_yum_utils"></a>`manage_yum_utils`
 
 Data type: `Boolean`
 
 Should the yum_utils/dnf_utils package be managed by this module on RedHat family nodes?
 If `true`, use the parameter `yum_utils` to determine how it should be manged
+
+Default value: `false`
 
 ##### <a name="-os_patching--block_patching_on_warnings"></a>`block_patching_on_warnings`
 
@@ -166,11 +174,15 @@ If there are warnings present in the os_patching fact, should the patching task 
 If `true` the run will abort and take no action
 If `false` the run will continue and attempt to patch (default)
 
+Default value: `false`
+
 ##### <a name="-os_patching--yum_utils"></a>`yum_utils`
 
 Data type: `Enum['installed', 'absent', 'purged', 'held', 'latest']`
 
 If managed, what should the yum_utils package set to?
+
+Default value: `'installed'`
 
 ##### <a name="-os_patching--fact_upload"></a>`fact_upload`
 
@@ -178,11 +190,15 @@ Data type: `Boolean`
 
 Should `puppet fact upload` be run after any changes to the fact cache files?
 
+Default value: `true`
+
 ##### <a name="-os_patching--autoremove"></a>`autoremove`
 
 Data type: `Boolean`
 
 Should autoremove via the package manager be run after reboot? Only supported on Debian and RedHat family nodes.
+
+Default value: `false`
 
 ##### <a name="-os_patching--manage_delta_rpm"></a>`manage_delta_rpm`
 
@@ -191,11 +207,15 @@ Data type: `Boolean`
 Should the deltarpm package be managed by this module on RedHat family nodes?
 If `true`, use the parameter `delta_rpm` to determine how it should be manged
 
+Default value: `false`
+
 ##### <a name="-os_patching--delta_rpm"></a>`delta_rpm`
 
 Data type: `Enum['installed', 'absent', 'purged', 'held', 'latest']`
 
 If managed, what should the delta_rpm package set to?
+
+Default value: `'installed'`
 
 ##### <a name="-os_patching--manage_yum_plugin_security"></a>`manage_yum_plugin_security`
 
@@ -204,11 +224,15 @@ Data type: `Boolean`
 Should the yum_plugin_security package be managed by this module on RedHat family nodes?
 If `true`, use the parameter `yum_plugin_security` to determine how it should be manged
 
+Default value: `false`
+
 ##### <a name="-os_patching--yum_plugin_security"></a>`yum_plugin_security`
 
 Data type: `Enum['installed', 'absent', 'purged', 'held', 'latest']`
 
 If managed, what should the yum_plugin_security package set to?
+
+Default value: `'installed'`
 
 ##### <a name="-os_patching--reboot_override"></a>`reboot_override`
 
@@ -216,6 +240,8 @@ Data type: `Optional[Variant[Boolean, Enum['always', 'never', 'patched', 'smart'
 
 Controls on a node level if a reboot should/should not be done after patching.
 This overrides the setting in the task
+
+Default value: `'default'`
 
 ##### <a name="-os_patching--patch_window"></a>`patch_window`
 
@@ -247,11 +273,15 @@ The full path of the command to run prior to running patching.  Can be used to
 run customised workflows such as gracefully shutting down applications.  The entry
 must be a single absolute filename with no arguments or parameters.
 
+Default value: `undef`
+
 ##### <a name="-os_patching--patch_cron_hour"></a>`patch_cron_hour`
 
 Data type: `Variant[Enum['absent'], Integer[0,23]]`
 
 The hour(s) for the cron job to run (defaults to absent, which means '*' in cron)
+
+Default value: `'absent'`
 
 ##### <a name="-os_patching--patch_cron_month"></a>`patch_cron_month`
 
@@ -259,17 +289,23 @@ Data type: `Variant[Enum['absent'], Integer[1,12]]`
 
 The month(s) for the cron job to run (defaults to absent, which means '*' in cron)
 
+Default value: `'absent'`
+
 ##### <a name="-os_patching--patch_cron_monthday"></a>`patch_cron_monthday`
 
 Data type: `Variant[Enum['absent'], Integer[1,31]]`
 
 The monthday(s) for the cron job to run (defaults to absent, which means '*' in cron)
 
+Default value: `'absent'`
+
 ##### <a name="-os_patching--patch_cron_weekday"></a>`patch_cron_weekday`
 
 Data type: `Variant[Enum['absent'], Integer[0,7]]`
 
 The weekday(s) for the cron job to run (defaults to absent, which means '*' in cron)
+
+Default value: `'absent'`
 
 ##### <a name="-os_patching--patch_cron_min"></a>`patch_cron_min`
 
@@ -285,11 +321,15 @@ Data type: `Integer[0,23]`
 
 Control the hour on which windows nodes check for updates
 
+Default value: `1`
+
 ##### <a name="-os_patching--windows_update_interval_mins"></a>`windows_update_interval_mins`
 
 Data type: `Integer`
 
 Control how often windows updates for updates
+
+Default value: `720`
 
 ##### <a name="-os_patching--fact_mode"></a>`fact_mode`
 
@@ -297,11 +337,15 @@ Data type: `Stdlib::Filemode`
 
 Mode to set on fact command file
 
+Default value: `'0700'`
+
 ##### <a name="-os_patching--ensure"></a>`ensure`
 
 Data type: `Enum['present', 'absent']`
 
 `present` to install scripts, cronjobs, files, etc, `absent` to cleanup a system that previously hosted us
+
+Default value: `'present'`
 
 ##### <a name="-os_patching--group"></a>`group`
 
@@ -316,6 +360,8 @@ Default value: `undef`
 Data type: `Integer`
 
 The number of seconds to wait after boot before running autoremove
+
+Default value: `300`
 
 ## Tasks
 
