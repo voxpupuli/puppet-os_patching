@@ -50,44 +50,38 @@ def history(dts, message, code, reboot, security, job)
   end
 end
 
-def run_with_timeout(command, timeout, tick)
-  output = ''
-  begin
-    # Start task in another thread, which spawns a process
-    stdin, stderrout, thread = Open3.popen2e(command)
-    # Get the pid of the spawned process
-    pid = thread[:pid]
-    start = Time.now
+def run_with_timeout(command, timeout)
+  stdout = ''
+  stderr = ''
+  exit_code = nil
+  wait_thr = nil
 
-    while (Time.now - start) < timeout && thread.alive?
-      # Wait up to `tick` seconds for output/error data
-      Kernel.select([stderrout], nil, nil, tick)
-      # Try to read the data
-      begin
-        output << stderrout.read_nonblock(BUFFER_SIZE)
-      rescue IO::WaitReadable
-        # A read would block, so loop around for another select
-        sleep 1
-      rescue EOFError
-        # Command has completed, not really an error...
-        break
+  begin
+    Timeout.timeout(timeout) do
+      Open3.popen3(*command) do |stdin, out, err, thread|
+        wait_thr = thread
+        stdin.close
+
+        stdout = out.read
+        stderr = err.read
+        exit_code = wait_thr.value.exitstatus
       end
     end
-    # Give Ruby time to clean up the other thread
-    sleep 1
-
-    if thread.alive?
-      # We need to kill the process, because killing the thread leaves
-      # the process alive but detached, annoyingly enough.
-      Process.kill('TERM', pid)
-      err('403', 'os_patching/patching', "TIMEOUT AFTER #{timeout} seconds\n#{output}", start)
+  rescue Timeout::Error
+    if wait_thr
+      begin
+        Process.kill('TERM', wait_thr.pid)
+        sleep 2
+        Process.kill('KILL', wait_thr.pid)
+      rescue Errno::ESRCH
+        nil
+      end
     end
-  ensure
-    stdin.close if stdin
-    stderrout.close if stderrout
-    status = thread.value.exitstatus
+
+    err('403', 'os_patching/patching', "TIMEOUT AFTER #{timeout} seconds", Time.now.iso8601)
   end
-  [status, output]
+
+  [exit_code, stdout, stderr]
 end
 
 # pending reboot detection function for windows
@@ -502,8 +496,8 @@ if os['family'] == 'RedHat'
   log.info 'Running yum upgrade'
   log.debug "Timeout value set to : #{timeout}"
   yum_end = ''
-  status, output = run_with_timeout("yum #{yum_params} #{securityflag} upgrade -y", timeout, 2)
-  err(status, 'os_patching/yum', "yum upgrade returned non-zero (#{status}) : #{output}", starttime) if status != 0
+  yum_exitcode, yum_output, yum_error = run_with_timeout("yum #{yum_params} #{securityflag} upgrade -y", timeout)
+  err(yum_exitcode, 'os_patching/yum', "yum upgrade returned non-zero (#{yum_exitcode}) : #{yum_output}\n#{yum_error}", starttime) if yum_exitcode != 0
 
   if os['release']['major'].to_i > 5
     # Capture the yum job ID
@@ -569,6 +563,9 @@ if os['family'] == 'RedHat'
   output(yum_return, reboot, security_only, 'Patching complete', pkg_hash, output, job, pinned_pkgs, starttime, log)
   log.info 'Patching complete'
 elsif os['family'] == 'Debian'
+  log.info 'Running apt'
+  log.debug "Timeout value set to : #{timeout}"
+
   # Are we doing security only patching?
   if security_only == true
     pkg_list = os_patching['security_package_updates']
@@ -582,10 +579,16 @@ elsif os['family'] == 'Debian'
   log.debug "Running apt #{apt_mode}"
   deb_front = 'DEBIAN_FRONTEND=noninteractive'
   deb_opts = '-o Apt::Get::Purge=false -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef --no-install-recommends'
-  apt_std_out, status = run_with_timeout("#{deb_front} apt-get #{dpkg_params} -y #{deb_opts} #{apt_mode}", timeout, 2)
-  err(status, 'os_patching/apt', apt_std_out, starttime) if status != 0
+  # apt_std_out, stderr, status = Open3.capture3("#{deb_front} apt-get #{dpkg_params} -y #{deb_opts} #{apt_mode}")
+  apt_exitcode, apt_out, apt_err = run_with_timeout("#{deb_front} apt-get #{dpkg_params} -y #{deb_opts} #{apt_mode}", timeout)
 
-  output('Success', reboot, security_only, 'Patching complete', pkg_list, apt_std_out, '', pinned_pkgs, starttime, log)
+  log.debug "apt output : #{apt_out}"
+  log.debug "apt error output : #{apt_err}"
+  log.debug "apt exit status : #{apt_exitcode}"
+
+  err(apt_exitcode, 'os_patching/apt', "Error: #{apt_err}", starttime) if apt_exitcode != 0
+
+  output('Success', reboot, security_only, 'Patching complete', pkg_list, apt_out.split("\n"), '', pinned_pkgs, starttime, log)
   log.info 'Patching complete'
 elsif os['family'] == 'windows'
   # we're on windows
@@ -645,7 +648,6 @@ elsif os['family'] == 'windows'
   # output results
   # def output(returncode, reboot, security, message, packages_updated, debug, job_id, pinned_packages, starttime)
   output('Success', reboot, security_only, 'Patching complete', update_titles, win_std_out.split("\n"), '', '', starttime, log)
-
 elsif os['family'] == 'Suse'
   zypper_required_params = '--non-interactive --no-abbrev --quiet'
   zypper_cmd_params = '--auto-agree-with-licenses'
@@ -656,15 +658,15 @@ elsif os['family'] == 'Suse'
   if security_only == true
     pkg_list = os_patching['security_package_updates']
     log.info 'Running zypper patch'
-    status, output = run_with_timeout("zypper #{zypper_required_params} #{zypper_params} patch -g security #{zypper_cmd_params}", timeout, 2)
-    err(status, 'os_patching/zypper', "zypper patch returned non-zero (#{status}) : #{output}", starttime) if status != 0
+    zypper_exitcode, zypper_output, zypper_error = run_with_timeout("zypper #{zypper_required_params} #{zypper_params} patch -g security #{zypper_cmd_params}", timeout)
+    err(zypper_exitcode, 'os_patching/zypper', "zypper patch returned non-zero (#{zypper_exitcode}) : #{zypper_output}\n#{zypper_error}", starttime) if zypper_exitcode != 0
   else
     pkg_list = os_patching['package_updates']
     log.info 'Running zypper update'
-    status, output = run_with_timeout("zypper #{zypper_required_params} #{zypper_params} update -t package #{zypper_cmd_params}", timeout, 2)
-    err(status, 'os_patching/zypper', "zypper update returned non-zero (#{status}) : #{output}", starttime) if status != 0
+    zypper_exitcode, zypper_output, zypper_error = run_with_timeout("zypper #{zypper_required_params} #{zypper_params} update -t package #{zypper_cmd_params}", timeout)
+    err(zypper_exitcode, 'os_patching/zypper', "zypper update returned non-zero (#{zypper_exitcode}) : #{zypper_output}\n#{zypper_error}", starttime) if zypper_exitcode != 0
   end
-  output('Success', reboot, security_only, 'Patching complete', pkg_list, output, '', pinned_pkgs, starttime, log)
+  output('Success', reboot, security_only, 'Patching complete', pkg_list, zypper_output.split("\n"), '', pinned_pkgs, starttime, log)
   log.info 'Patching complete'
   log.debug "Timeout value set to : #{timeout}"
 else
