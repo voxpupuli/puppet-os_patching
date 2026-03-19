@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v3.2.0](https://github.com/voxpupuli/puppet-os_patching/tree/v3.2.0) (2026-03-19)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.1.0...v3.2.0)
+
+**Implemented enhancements:**
+
+- feat: improve timeout handling [\#279](https://github.com/voxpupuli/puppet-os_patching/pull/279) ([rwaffen](https://github.com/rwaffen))
+
 ## [v3.1.0](https://github.com/voxpupuli/puppet-os_patching/tree/v3.1.0) (2026-03-05)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.0.1...v3.1.0)
