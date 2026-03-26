@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v4.0.0](https://github.com/voxpupuli/puppet-os_patching/tree/v4.0.0) (2026-03-26)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.2.0...v4.0.0)
+
+**Breaking changes:**
+
+- refactor: use dnf instead of yum, fix rhel output, replace regexp, add more docs, remove rhel 5 code [\#282](https://github.com/voxpupuli/puppet-os_patching/pull/282) ([rwaffen](https://github.com/rwaffen))
+
+**Fixed bugs:**
+
+- patch\_server fails on RHEL 9 and OracleLinux 8 [\#281](https://github.com/voxpupuli/puppet-os_patching/issues/281)
+
 ## [v3.2.0](https://github.com/voxpupuli/puppet-os_patching/tree/v3.2.0) (2026-03-19)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.1.0...v3.2.0)

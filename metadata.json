@@ -1,6 +1,6 @@
 {
   "name": "puppet-os_patching",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "author": "Vox Pupuli",
   "summary": "Perform OS level patching through tasks and report on patch levels through facts",
   "license": "Apache-2.0",
