@@ -138,7 +138,7 @@ def pending_reboot_linux(log, starttime)
       return true if status != 0
     else
       log.warn 'needs-restarting command not found, cannot determine if reboot is required'
-      log.warn 'please install the yum-util/dnf-utils package to enable this functionality'
+      log.warn 'please install the dnf-utils package to enable this functionality'
     end
 
     return false
@@ -491,76 +491,119 @@ if updatecount.zero?
   exit(0)
 end
 
-# Run the patching
+# Run the patching on the appropriate platforms
+###############################################################################
+
 if os['family'] == 'RedHat'
-  log.info 'Running yum upgrade'
+  log.info 'Running dnf upgrade'
   log.debug "Timeout value set to : #{timeout}"
-  yum_end = ''
-  yum_exitcode, yum_output, yum_error = run_with_timeout("yum #{yum_params} #{securityflag} upgrade -y", timeout)
-  err(yum_exitcode, 'os_patching/yum', "yum upgrade returned non-zero (#{yum_exitcode}) : #{yum_output}\n#{yum_error}", starttime) if yum_exitcode != 0
 
-  if os['release']['major'].to_i > 5
-    # Capture the yum job ID
-    log.info 'Getting yum job ID'
-    job = ''
-    yum_id, stderr, status = Open3.capture3('yum history')
-    err(status, 'os_patching/yum', stderr, starttime) if status != 0
-    yum_id.split("\n").each do |line|
-      # Quite the regex.  This pulls out fields 1 & 3 from the first info line
-      # from `yum history`,  which look like this :
-      # ID     | Login user               | Date and time    | 8< SNIP >8
-      # ------------------------------------------------------ 8< SNIP >8
-      #     69 | System <unset>           | 2018-09-17 17:18 | 8< SNIP >8
-      matchdata = line.to_s.match(/^\s+(\d+)\s*\|\s*[\w\-<>,= ]*\|\s*([\d:\- ]*)/)
-      next unless matchdata
-      job = matchdata[1]
-      yum_end = matchdata[2]
-      break
-    end
+  dnf_exitcode, dnf_output, dnf_error = run_with_timeout("dnf #{yum_params} #{securityflag} upgrade -y", timeout)
 
-    # Fail if we didn't capture a job ID
-    err(1, 'os_patching/yum', 'yum job ID not found', starttime) if job.empty?
+  err(dnf_exitcode, 'os_patching/dnf', "dnf upgrade returned non-zero (#{dnf_exitcode}) : #{dnf_output}\n#{dnf_error}", starttime) if dnf_exitcode != 0
 
-    # Fail if we didn't capture a job time
-    err(1, 'os_patching/yum', 'yum job time not found', starttime) if yum_end.empty?
+  # Capture the dnf job ID
+  log.info 'Getting dnf job ID'
+  job_id = nil
+  job_date = nil
 
-    # Check that the first yum history entry was after the yum_start time
-    # we captured.  Append ':59' to the date as yum history only gives the
-    # minute and if yum bails, it will usually be pretty quick
-    parsed_end = Time.parse(yum_end + ':59').iso8601
-    err(1, 'os_patching/yum', 'Yum did not appear to run', starttime) if parsed_end < starttime
+  dnf_history, stderr, status = Open3.capture3('dnf history')
+  err(status, 'os_patching/dnf', stderr, starttime) if status != 0
 
-    # Capture the yum return code
-    log.debug "Getting yum return code for job #{job}"
-    yum_status, stderr, status = Open3.capture3("yum history info #{job}")
-    yum_return = ''
-    err(status, 'os_patching/yum', stderr, starttime) if status != 0
-    yum_status.split("\n").each do |line|
-      matchdata = line.match(/^Return-Code\s+:\s+(.*)$/)
-      next unless matchdata
-      yum_return = matchdata[1]
-      break
-    end
+  dnf_history.split("\n").each do |line|
+    # get `dnf history`,  which look like this :
+    #
+    # ID | Command line                         | Date and time    | Action(s)      | Altered
+    # ----------------------------------------------------------------------------------------
+    # 12 | upgrade -y                           | 2026-03-26 11:24 | Upgrade        |    1
+    # 11 | downgrade openvox-agent-8.24.2-1.el8 | 2026-03-26 11:22 | Downgrade      |    1
+    #
+    # Search for the first line with "upgrade -y" which should be our patching run, and pull out the job ID and date from that line.
+    #
+    next unless line.include?('upgrade -y')
 
-    err(status, 'os_patching/yum', 'yum return code not found', starttime) if yum_return.empty?
+    # split the line into fields and pull out the job ID and date.
+    # The fields are separated by '|' characters, but there may be multiple spaces around them,
+    # so we split on '|' and then strip whitespace from the resulting fields.
+    fields = line.split('|').map(&:strip)
+    job_id = fields[0]
+    job_date = fields[2]
 
-    pkg_hash = {}
-    # Pull out the updated package list from yum history
-    log.debug "Getting updated package list for job #{job}"
-    updated_packages, stderr, status = Open3.capture3("yum history info #{job}")
-    err(status, 'os_patching/yum', stderr, starttime) if status != 0
-    updated_packages.split("\n").each do |line|
-      matchdata = line.match(/^\s+(Installed|Install|Upgraded|Erased|Updated)\s+(\S+)\s/)
-      next unless matchdata
-      pkg_hash[matchdata[2]] = matchdata[1]
-    end
-  else
-    yum_return = 'Assumed successful - further details not available on RHEL5'
-    job = 'Unsupported on RHEL5'
-    pkg_hash = {}
+    break
   end
 
-  output(yum_return, reboot, security_only, 'Patching complete', pkg_hash, output, job, pinned_pkgs, starttime, log)
+  log.debug "Captured dnf job ID : #{job_id}"
+  log.debug "Captured dnf job date : #{job_date}"
+
+  # Fail if we didn't capture a job ID
+  err(1, 'os_patching/dnf', 'dnf job ID not found', starttime) if job_id.nil?
+
+  # Fail if we didn't capture a job time
+  err(1, 'os_patching/dnf', 'dnf job time not found', starttime) if job_date.nil?
+
+  # Check that the first dnf history entry was after the dnf_start time
+  # we captured.  Append ':59' to the date as dnf history only gives the
+  # minute and if dnf bails, it will usually be pretty quick
+  parsed_end = Time.parse(job_date + ':59').iso8601
+  err(1, 'os_patching/dnf', 'DNF did not appear to run', starttime) if parsed_end < starttime
+
+  # Capture the dnf return code
+  log.debug "Getting dnf return code for job #{job_id}"
+
+  # Example output of `dnf history info <job_id>` :
+  #
+  # Transaction ID : 12
+  # Begin time     : Thu Mar 26 11:24:18 2026
+  # Begin rpmdb    : 485:f7aac331cf34d853f41f365d90ebec3de52f633e
+  # End time       : Thu Mar 26 11:24:24 2026 (6 seconds)
+  # End rpmdb      : 485:6cecf20abc141842a1fc3d31e6cfb72a5588e76c
+  # User           : root <root>
+  # Return-Code    : Success
+  # Releasever     : 8
+  # Command Line   : upgrade -y
+  # Comment        :
+  # Packages Altered:
+  #     Upgrade  openvox-agent-8.25.0-1.el8.x86_64 @openvox8
+  #     Upgraded openvox-agent-8.24.2-1.el8.x86_64 @@System
+  #
+  job_status, stderr, status = Open3.capture3("dnf history info #{job_id}")
+  dnf_return = nil
+
+  err(status, 'os_patching/dnf', stderr, starttime) if status != 0
+
+  job_status.split("\n").each do |line|
+    next unless line.start_with?('Return-Code')
+
+    # Split the line into fields and pull out the return code.
+    # The fields are separated by ':' characters, but there may be multiple spaces around them,
+    # so we split on ':' and then strip whitespace from the resulting fields.
+    # There might also be multiple colons in the return code if there is an error,
+    # so we limit the split to 2 fields to ensure we capture the whole return code.
+    dnf_return = line.split(':', 2).last.strip
+
+    break
+  end
+
+  err(status, 'os_patching/dnf', 'dnf return code not found', starttime) if dnf_return.nil?
+
+  pkg_hash = {}
+  # Pull out the updated package list from dnf history
+  log.debug "Getting updated package list for job #{job_id}"
+
+  updated_packages, stderr, status = Open3.capture3("dnf history info #{job_id}")
+  err(status, 'os_patching/dnf', stderr, starttime) if status != 0
+
+  updated_packages.split("\n").each do |line|
+    next unless line.strip.start_with?('Erased', 'Install', 'Removed', 'Updated', 'Upgraded')
+
+    # Split the line into fields and pull out the action and package name.
+    # The fields are separated by spaces, but there may be multiple spaces around them,
+    # so we split on spaces and then strip whitespace from the resulting fields
+    action, pkg_name, _source = line.split.map(&:strip)
+    pkg_hash[pkg_name] = action
+  end
+
+  output(dnf_return, reboot, security_only, 'Patching complete', pkg_hash, job_status.split("\n"), job_id, pinned_pkgs, starttime, log)
   log.info 'Patching complete'
 elsif os['family'] == 'Debian'
   log.info 'Running apt'
