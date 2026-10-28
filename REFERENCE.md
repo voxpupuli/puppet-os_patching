@@ -938,4 +938,3 @@ Data type: `Optional[String]`
 Additional parameters for zypper
 
 Default value: `undef`
-
