@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 Each new release typically also includes the latest modulesync defaults.
 These should not affect the functionality of the module.
 
+## [v4.1.0](https://github.com/voxpupuli/puppet-os_patching/tree/v4.1.0) (2026-10-28)
+
+[Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v4.0.0...v4.1.0)
+
+**Implemented enhancements:**
+
+- puppet/systemd: Allow 11.x [\#288](https://github.com/voxpupuli/puppet-os_patching/pull/288) ([bastelfreak](https://github.com/bastelfreak))
+- Update requirements to allow OpenVox 9 [\#287](https://github.com/voxpupuli/puppet-os_patching/pull/287) ([sebastianrakel](https://github.com/sebastianrakel))
+
 ## [v4.0.0](https://github.com/voxpupuli/puppet-os_patching/tree/v4.0.0) (2026-03-26)
 
 [Full Changelog](https://github.com/voxpupuli/puppet-os_patching/compare/v3.2.0...v4.0.0)
@@ -172,7 +181,6 @@ These should not affect the functionality of the module.
 
 **Implemented enhancements:**
 
-- The os\_patching\_fact\_generation.sh does not run apt update [\#217](https://github.com/voxpupuli/puppet-os_patching/issues/217)
 - Fix up the GitHub workflows [\#209](https://github.com/voxpupuli/puppet-os_patching/pull/209) ([albatrossflavour](https://github.com/albatrossflavour))
 
 **Closed issues:**
