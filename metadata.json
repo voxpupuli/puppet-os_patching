@@ -18,7 +18,7 @@
     },
     {
       "name": "puppetlabs-scheduled_task",
-      "version_requirement": ">= 4.0.3 < 5.0.0"
+      "version_requirement": ">= 4.0.3 < 6.0.0"
     },
     {
       "name": "puppetlabs-cron_core",
