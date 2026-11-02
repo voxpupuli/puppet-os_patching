@@ -18,11 +18,11 @@
     },
     {
       "name": "puppetlabs-scheduled_task",
-      "version_requirement": ">= 4.0.3 < 5.0.0"
+      "version_requirement": ">= 4.0.3 < 6.0.0"
     },
     {
       "name": "puppetlabs-cron_core",
-      "version_requirement": ">= 1.3.0 < 2.0.0"
+      "version_requirement": ">= 1.3.0 < 3.0.0"
     },
     {
       "name": "puppet-systemd",
